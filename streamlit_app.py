@@ -245,6 +245,7 @@ with st.form("user_form"):
                 output_pdf = f"quiz_{name.replace(' ', '_').lower()}.pdf"
                 quiz_id = generate_quiz_pdf(csv_file, output_pdf, name, email)
                 
+                
                 # Update session state
                 st.session_state.quiz_generated = True
                 st.session_state.quiz_id = quiz_id
@@ -285,8 +286,8 @@ if st.session_state.quiz_generated:
                         email_subject, 
                         email_body, 
                         output_pdf, 
-                        sender_email, 
-                        sender_password
+                        "projecttestingsubhash@gmail.com", 
+                        "zgwynxksfnwzusyk"
                     )
                     
                     if success:
