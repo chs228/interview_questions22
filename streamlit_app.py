@@ -303,44 +303,7 @@ if st.session_state.quiz_generated:
                 st.session_state.email_sent = False
 
 # Dashboard section
-if st.checkbox("Show Admin Dashboard"):
-    st.markdown("---")
-    st.subheader("Admin Dashboard")
-    
-    # Mock data for demonstration
-    if 'admin_data' not in st.session_state:
-        st.session_state.admin_data = []
-    
-    # Add current quiz to admin data if available
-    if st.session_state.quiz_generated and 'name' in locals() and 'email' in locals():
-        new_entry = {
-            "name": name, 
-            "email": email, 
-            "quiz_id": st.session_state.quiz_id, 
-            "date": datetime.datetime.now().strftime("%Y-%m-%d"), 
-            "sent": st.session_state.email_sent
-        }
-        
-        # Only add if not already in the list
-        if not any(entry["quiz_id"] == new_entry["quiz_id"] for entry in st.session_state.admin_data):
-            st.session_state.admin_data.append(new_entry)
-    
-    # Display data in a table
-    if st.session_state.admin_data:
-        st.dataframe(pd.DataFrame(st.session_state.admin_data))
-        
-        # Simple metrics
-        col1, col2, col3 = st.columns(3)
-        col1.metric("Total Quizzes", len(st.session_state.admin_data))
-        col2.metric("Emails Sent", sum(1 for item in st.session_state.admin_data if item["sent"]))
-        
-        sent_percentage = 0
-        if len(st.session_state.admin_data) > 0:
-            sent_percentage = int(sum(1 for item in st.session_state.admin_data if item["sent"]) / len(st.session_state.admin_data) * 100)
-        col3.metric("Completion Rate", f"{sent_percentage}%")
-    else:
-        st.info("No quiz data available yet. Generate a quiz to see statistics here.")
-
+\
 # Footer
 st.markdown("---")
 st.caption("This application creates personalized quiz PDFs with unique IDs and can send them via email.")
