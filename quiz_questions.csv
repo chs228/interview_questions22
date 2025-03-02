@@ -1,0 +1,508 @@
+Question
+What are the key differences between batch gradient descent and stochastic gradient descent?
+Explain the concept of exploding and vanishing gradients in neural networks.
+Describe different activation functions used in neural networks and their properties.
+How can you prevent overfitting in deep learning models?
+What are convolutional neural networks (CNNs) and how are they used for image recognition?
+Explain recurrent neural networks (RNNs) and their applications in natural language processing.
+"What are LSTMs and GRUs, and how do they address the vanishing gradient problem in RNNs?"
+Describe the concept of word embeddings and techniques like Word2Vec and GloVe.
+How can you perform text classification using machine learning techniques?
+Explain different techniques for handling imbalanced classes in classification problems.
+What is feature engineering and why is it important in machine learning?
+Describe different feature selection techniques and when to use them.
+How do you handle outliers in a dataset?
+What are the advantages and disadvantages of using decision trees?
+Explain the concept of ensemble learning and name some ensemble methods.
+What is the difference between bagging and boosting? Give examples of each.
+Describe the Random Forest algorithm and its benefits.
+"Explain the Gradient Boosting algorithm (e.g., XGBoost, LightGBM, CatBoost) and its advantages."
+What are support vector machines (SVMs) and how do they work?
+Explain the concept of kernel trick in SVMs.
+What is clustering? Describe different clustering algorithms.
+Explain the K-Means clustering algorithm.
+How do you evaluate the performance of a clustering algorithm?
+What is dimensionality reduction and why is it useful?
+Explain Principal Component Analysis (PCA) and its applications.
+What is t-SNE and when would you use it over PCA?
+Describe different types of data visualization techniques and when to use them.
+How do you choose the right evaluation metric for a classification problem?
+"Explain precision, recall, F1-score, and AUC-ROC curve."
+What is the difference between Type I and Type II errors in hypothesis testing?
+Explain p-value and its significance in hypothesis testing.
+What is A/B testing and how is it used in data science?
+"Describe different types of distributions (e.g., normal, binomial, Poisson) and their properties."
+What is correlation and causation? Explain the difference.
+How do you detect multicollinearity in regression models?
+Explain the concept of confidence intervals.
+What is regularization and why is it important in machine learning?
+Describe L1 and L2 regularization and their differences.
+How do you choose the regularization parameter (lambda) in a model?
+What is cross-validation and why is it used?
+Explain k-fold cross-validation.
+What is stratified cross-validation and when is it useful?
+How do you handle missing data? Describe different imputation techniques.
+What are different types of feature scaling and when to use them?
+Explain standardization and normalization.
+How do you handle categorical variables in machine learning?
+Describe one-hot encoding and label encoding.
+What is feature selection and feature extraction? Explain the difference.
+"Explain forward selection, backward elimination, and recursive feature elimination."
+How do you evaluate a regression model? What metrics are important?
+"Explain Mean Absolute Error (MAE), Mean Squared Error (MSE), and Root Mean Squared Error (RMSE)."
+What is R-squared and adjusted R-squared?
+How do you diagnose and fix overfitting and underfitting in a model?
+Explain the bias-variance tradeoff.
+How do you choose the right machine learning algorithm for a given problem?
+Describe the steps involved in a typical machine learning project lifecycle.
+How do you define the problem statement in a data science project?
+How do you identify and collect relevant data for a data science project?
+How do you explore and clean data in a data science project?
+How do you build and train a machine learning model?
+How do you evaluate and validate a machine learning model?
+How do you deploy and monitor a machine learning model?
+Explain the importance of model interpretability and explainability.
+"What are different techniques for model interpretation (e.g., feature importance, SHAP values)?"
+How do you communicate the results of a data science project to a non-technical audience?
+Describe a time you faced a challenging data science problem and how you solved it.
+Walk me through a data science project you are proud of. (Be prepared to discuss in detail)
+"If you were given a new dataset, what would be your first steps?"
+What are some common data visualization libraries in Python?
+Explain the difference between long format and wide format data.
+How would you use Pandas to read and manipulate data in Python?
+What are the advantages of using Python for data science?
+"Describe the difference between lists, tuples, and dictionaries in Python."
+What are functions and classes in Python and why are they useful?
+Explain the concept of version control and why it's important for data science projects.
+What is Git and how do you use it for version control?
+"Describe the typical workflow of using Git (e.g., branching, merging, pull requests)."
+What are some best practices for writing clean and maintainable code?
+How do you debug code in Python?
+What are unit tests and why are they important?
+How do you write unit tests in Python (using libraries like unittest or pytest)?
+What are docstrings and why are they important for code documentation?
+Explain the concept of code refactoring and its benefits.
+What are design patterns and why are they useful in software development?
+Describe the SOLID principles of object-oriented design.
+What is database normalization and why is it important?
+"Explain different database normalization forms (e.g., 1NF, 2NF, 3NF)."
+What are SQL and NoSQL databases? What are their differences and when would you use each?
+"Describe common SQL operations (e.g., SELECT, JOIN, GROUP BY, WHERE)."
+How do you optimize SQL queries for performance?
+What is data warehousing and why is it used?
+"Explain ETL (Extract, Transform, Load) processes in data warehousing."
+What are data lakes and how are they different from data warehouses?
+"Describe different cloud computing platforms (e.g., AWS, Azure, GCP) and their services relevant to data science."
+What are some cloud-based data science tools and services?
+Explain serverless computing and its benefits for data science applications.
+"What are containers and containerization (e.g., Docker, Kubernetes) and why are they useful in data science?"
+How do you deploy a machine learning model to production?
+"Describe different model deployment strategies (e.g., online, batch, shadow deployment)."
+What are REST APIs and how are they used for model serving?
+How do you monitor the performance of a deployed machine learning model?
+What are some metrics to track for monitoring model performance in production?
+How do you handle model drift and concept drift in production?
+What are ethical considerations in data science and AI?
+Explain bias in data and algorithms and how to mitigate it.
+What is fairness in machine learning and how can it be measured?
+"Describe different fairness metrics (e.g., demographic parity, equal opportunity)."
+How do you ensure data privacy and security in data science projects?
+What are GDPR and other data privacy regulations?
+Explain different data anonymization techniques.
+What are adversarial attacks and defenses in machine learning?
+How do you ensure the robustness and reliability of machine learning models?
+What are some common data quality issues and how to address them?
+Explain data validation and data verification processes.
+What are data governance and data lineage?
+How do you collaborate effectively in a data science team?
+Describe your experience working in agile or other project management methodologies.
+How do you prioritize tasks and manage your time effectively in a data science project?
+How do you handle conflicts and disagreements within a team?
+How do you give and receive constructive feedback?
+How do you present technical information to different audiences?
+Describe your communication style and how you adapt it to different situations.
+How do you handle ambiguity and uncertainty in data science projects?
+How do you approach problem-solving in a structured and systematic way?
+Describe your problem-solving process and how you break down complex problems.
+How do you think critically and challenge assumptions in data science projects?
+How do you learn new technologies and skills quickly?
+What are your strengths and weaknesses as a data scientist?
+Why are you interested in data science?
+What are your career goals in data science?
+Where do you see yourself in 5 years in the data science field?
+What are you passionate about in data science?
+How do you stay updated with the latest trends and advancements in data science?
+"What are some data science blogs, podcasts, or communities you follow?"
+Describe a data science project that you found particularly interesting or challenging.
+What kind of data science projects are you most interested in working on?
+"What is your experience with cloud computing platforms like AWS, Azure, or GCP?"
+What is your experience with big data technologies like Hadoop or Spark?
+"What is your experience with different programming languages used in data science (e.g., Python, R, SQL)?"
+"What is your experience with different machine learning libraries (e.g., scikit-learn, TensorFlow, PyTorch)?"
+What is your experience with database management and SQL?
+What is your experience with data visualization tools?
+Have you ever presented your data science work to stakeholders? Describe the situation.
+Have you ever worked with a team on a data science project? Describe your role and contributions.
+Have you ever had to deal with missing or messy data? How did you handle it?
+Have you ever built and deployed a machine learning model? Describe the process.
+Have you ever encountered ethical dilemmas in a data science project? How did you address them?
+Tell me about a time you failed in a data science project. What did you learn from it?
+Tell me about a time you had to convince someone of your data-driven insights.
+Tell me about a time you had to explain a complex technical concept to a non-technical audience.
+Tell me about a time you had to adapt to changing requirements in a project.
+Tell me about a time you had to work under pressure or tight deadlines.
+Tell me about a time you went above and beyond what was expected in a project.
+Tell me about a time you had to learn a new technology or skill quickly.
+Tell me about a time you had to resolve a conflict within a team.
+"If you could create any data science project, regardless of resources, what would it be?"
+How would you design a data science team for a specific business problem?
+How would you measure the business impact of a data science project?
+What are some emerging trends in data science and AI that you are excited about?
+What are some limitations of current machine learning techniques and where do you see the field going?
+"If you were leading a data science department, what would be your key priorities?"
+How would you foster a culture of innovation and learning within a data science team?
+How would you handle a situation where stakeholders have unrealistic expectations about a data science project?
+How would you explain the value of data science to a CEO who is skeptical?
+Imagine you are given a completely new and unknown problem. How would you approach it from a data science perspective?
+Describe a time you had to make a difficult decision with incomplete or ambiguous data.
+How do you balance technical rigor with practical business needs in a data science project?
+What are some common pitfalls to avoid in data science projects?
+"If you encountered a situation where your model produced biased or unfair results, what steps would you take?"
+How would you convince a client to adopt a more complex but potentially more effective machine learning model?
+Describe a scenario where you had to deal with a very large dataset. What challenges did you face and how did you overcome them?
+How would you design a system to detect and prevent fraud using machine learning?
+How would you approach building a recommendation system for an e-commerce platform?
+How would you build a natural language processing system to analyze customer feedback?
+How would you design a computer vision system for object detection in autonomous driving?
+Let's say a key metric for your deployed model suddenly drops. How would you diagnose and resolve the issue?
+"If you had to explain machine learning to a 5-year-old, how would you do it?"
+What is data? Explain it in simple terms.
+Can you give me an example of how data is used in everyday life?
+Why is it important to clean data before using it?
+What is a model in machine learning? Explain it simply.
+What does it mean to train a model?
+What is prediction in machine learning?
+Give me an example of a classification problem.
+Give me an example of a regression problem.
+Why is it important to evaluate a machine learning model?
+What is a good model vs. a bad model in simple terms?
+How can you make a model better if it's not performing well?
+What are some of the tools you might use as a data scientist?
+Why is math important for data science?
+Why is programming important for data science?
+"What is the difference between AI, machine learning, and deep learning?"
+What are some real-world applications of data science?
+What excites you most about data science?
+What are you hoping to learn in a data science role?
+What are the fundamental data types in Python?
+Explain the difference between lists and tuples in Python.
+How are dictionaries implemented in Python and what are their use cases?
+What is the difference between mutable and immutable data types in Python? Give examples.
+Explain list comprehensions in Python and provide an example.
+What are lambda functions in Python? When would you use them?
+Explain the use of decorators in Python.
+What are generators in Python? How are they memory efficient?
+Describe the concept of iterators and iterables in Python.
+Explain the use of `*args` and `**kwargs` in function definitions.
+What is the difference between shallow copy and deep copy in Python?
+How does Python handle memory management? (Garbage Collection)
+What are modules and packages in Python? How do you import them?
+Explain the concept of virtual environments in Python and why they are important.
+What is the purpose of `__name__ == '__main__'` in Python scripts?
+"How do you handle exceptions in Python? Explain `try`, `except`, `finally` blocks."
+What are custom exceptions in Python? How do you define them?
+Explain the concept of object-oriented programming (OOP) in Python.
+What are classes and objects in Python?
+"Explain inheritance, polymorphism, and encapsulation in Python OOP."
+What are magic methods (dunder methods) in Python? Give examples.
+How do you use file I/O in Python to read and write data?
+"Explain different file modes in Python (`'r'`, `'w'`, `'a'`, `'b'`, `'+'`)."
+How do you work with CSV files in Python? (Using the `csv` module)
+How do you work with JSON files in Python? (Using the `json` module)
+What are regular expressions in Python (`re` module)? Give examples of their use in data science.
+How would you use Python to scrape data from a website? (Briefly mention libraries)
+"Explain the use of list, dictionary, and set comprehensions for data manipulation."
+How can you profile Python code for performance optimization?
+What are some common performance bottlenecks in Python and how to address them?
+"Explain the use of `map()`, `filter()`, and `reduce()` functions in Python."
+What are decorators and how can they be used to enhance function behavior?
+How can you write unit tests in Python? (Using `unittest` or `pytest`)
+What are docstrings and why are they important for Python code?
+Explain the PEP 8 style guide for Python code.
+"How do you use virtual environments (e.g., `venv`, `conda env`) to manage project dependencies?"
+What is pip and how do you use it to manage Python packages?
+How would you install and manage different versions of Python on your system?
+Explain the concept of packaging and distributing Python code.
+What is the purpose of setup.py or pyproject.toml files in Python projects?
+"Describe the NumPy library and its core data structure, the ndarray."
+What are NumPy arrays and how are they different from Python lists?
+Explain vectorized operations in NumPy and their benefits for performance.
+"How do you create NumPy arrays? (e.g., `np.array`, `np.zeros`, `np.ones`, `np.arange`, `np.linspace`)"
+Explain different indexing and slicing techniques for NumPy arrays.
+What is broadcasting in NumPy and how does it work?
+How do you perform element-wise operations on NumPy arrays?
+"How do you perform linear algebra operations using NumPy (e.g., matrix multiplication, transpose, inverse)?"
+Explain the concept of axis in NumPy array operations.
+How do you reshape and flatten NumPy arrays?
+How do you concatenate and split NumPy arrays?
+"How do you perform statistical operations on NumPy arrays (e.g., mean, median, std, sum, min, max)?"
+How do you handle missing data (NaN) in NumPy arrays?
+How do you load and save NumPy arrays to files?
+"Describe the Pandas library and its core data structures, Series and DataFrame."
+What are Pandas Series and DataFrames? How are they different?
+"How do you create Pandas Series and DataFrames? (From lists, dictionaries, NumPy arrays, CSV files)"
+"How do you load data from CSV, Excel, and other file formats into Pandas DataFrames?"
+"Explain different ways to access and select data in Pandas DataFrames (e.g., `loc`, `iloc`, boolean indexing)."
+How do you filter rows and columns in a Pandas DataFrame based on conditions?
+How do you add and remove columns in a Pandas DataFrame?
+How do you rename columns and indices in a Pandas DataFrame?
+How do you sort a Pandas DataFrame by column values or index?
+"How do you handle missing data in Pandas DataFrames? (e.g., `isnull()`, `fillna()`, `dropna()`)"
+Explain different methods for imputing missing values in Pandas DataFrames.
+How do you handle duplicate data in Pandas DataFrames?
+Explain the concept of data aggregation in Pandas using `groupby()`.
+"How do you perform aggregation functions (e.g., `sum()`, `mean()`, `count()`, `min()`, `max()`) after `groupby()`?"
+How do you apply custom aggregation functions using `agg()` in Pandas?
+Explain how to join and merge Pandas DataFrames using `merge()` and `join()`.
+"What are different types of joins in Pandas `merge()` (e.g., inner, outer, left, right)?"
+How do you concatenate Pandas DataFrames using `concat()`?
+Explain how to pivot and unpivot Pandas DataFrames using `pivot()` and `melt()`.
+"How do you perform string operations on columns in Pandas DataFrames (e.g., using `.str` methods)?"
+How do you work with date and time data in Pandas DataFrames? (Using `datetime` objects and `.dt` accessor)
+How do you resample time series data in Pandas?
+How do you perform rolling window calculations on time series data in Pandas?
+How do you apply functions element-wise or column-wise to Pandas DataFrames using `apply()` and `applymap()`?
+How do you use `vectorize` to apply NumPy functions efficiently to Pandas Series and DataFrames?
+Explain the concept of indexing in Pandas and how to set and reset indices.
+How do you create multi-level or hierarchical indexes in Pandas DataFrames?
+How do you work with multi-level indexed DataFrames for complex data analysis?
+How do you iterate over rows or columns in a Pandas DataFrame? (And why it's often discouraged)
+How can you optimize Pandas code for performance with large datasets?
+What are Categorical data types in Pandas and when are they useful?
+Explain how to use Pandas for basic exploratory data analysis (EDA).
+"How do you calculate descriptive statistics using Pandas (e.g., `describe()`, `value_counts()`, `corr()`)?"
+"How do you create basic plots directly from Pandas DataFrames using `.plot()`? (Line, bar, scatter, histogram)"
+"Describe the scikit-learn library and its main modules (e.g., `model_selection`, `preprocessing`, `linear_model`, `tree`, `ensemble`, `metrics`)."
+How do you split data into training and testing sets using scikit-learn?
+"Explain different cross-validation techniques in scikit-learn (e.g., k-fold, stratified k-fold)."
+"What are different feature scaling techniques in scikit-learn and when to use them (e.g., StandardScaler, MinMaxScaler, RobustScaler)?"
+"How do you handle categorical features using scikit-learn (e.g., OneHotEncoder, LabelEncoder)?"
+"How do you perform feature selection using scikit-learn (e.g., SelectKBest, RFE)?"
+Explain how to train a linear regression model using scikit-learn.
+"How do you evaluate a linear regression model using scikit-learn (e.g., MAE, MSE, RMSE, R-squared)?"
+How do you train a logistic regression model using scikit-learn?
+"How do you evaluate a classification model using scikit-learn (e.g., accuracy, precision, recall, F1-score, AUC-ROC curve, confusion matrix)?"
+Explain how to train a decision tree classifier and regressor using scikit-learn.
+How do you visualize a decision tree using scikit-learn and graphviz?
+Explain how to train a random forest classifier and regressor using scikit-learn.
+"What are hyperparameter tuning and model selection in scikit-learn? (Using GridSearchCV, RandomizedSearchCV)"
+"How do you prevent overfitting in scikit-learn models? (Using regularization, cross-validation, pruning)"
+How do you save and load scikit-learn models (using `pickle` or `joblib`)?
+Explain the typical workflow of building a machine learning model using scikit-learn.
+How do you build a pipeline in scikit-learn to streamline preprocessing and model training?
+What are custom transformers in scikit-learn and how can you create them?
+"How do you perform dimensionality reduction using scikit-learn (e.g., PCA)?"
+"How do you perform clustering using scikit-learn (e.g., KMeans, DBSCAN)?"
+How do you evaluate clustering performance in scikit-learn?
+"How do you work with text data in scikit-learn? (Using CountVectorizer, TfidfVectorizer)"
+How do you build a simple text classification model using scikit-learn?
+How do you evaluate the performance of a text classification model?
+Explain the concept of model interpretability and explainability in the context of scikit-learn models.
+"How do you extract feature importance from scikit-learn models (e.g., tree-based models, linear models)?"
+How can you visualize model predictions and evaluation results using matplotlib and seaborn in conjunction with scikit-learn?
+Describe the Matplotlib library and its basic plotting functionalities.
+"How do you create basic plots using Matplotlib (e.g., line plots, scatter plots, bar plots, histograms)?"
+"How do you customize plots in Matplotlib (e.g., titles, labels, legends, colors, markers, line styles)?"
+How do you create subplots in Matplotlib to display multiple plots in one figure?
+"How do you create different types of plots in Matplotlib (e.g., pie charts, box plots, violin plots, heatmaps)?"
+How do you create 3D plots using Matplotlib?
+How do you save Matplotlib plots to files?
+Describe the Seaborn library and its advantages over Matplotlib for statistical visualizations.
+"How do you create statistical plots using Seaborn (e.g., histograms, distplots, boxplots, violinplots, scatter plots, pair plots, heatmaps)?"
+"How do you customize Seaborn plots (e.g., styles, palettes, annotations)?"
+How do you use Seaborn for categorical data visualization?
+How do you use Seaborn for visualizing relationships between multiple variables?
+How do you create heatmaps and correlation matrices using Seaborn?
+How do you integrate Matplotlib and Seaborn plots with Pandas DataFrames for data visualization?
+How do you choose the right type of plot for different data types and analytical tasks?
+What are some best practices for creating effective and informative data visualizations in Python?
+"How do you create interactive plots in Python? (Briefly mention libraries like Plotly, Bokeh)"
+Explain the purpose and benefits of using Jupyter Notebooks or JupyterLab for data science work in Python.
+"How do you use Jupyter Notebooks for interactive coding, documentation, and presentation?"
+What are Markdown cells in Jupyter Notebooks and how do you use them for documentation?
+"How do you use magic commands in Jupyter Notebooks (e.g., `%matplotlib inline`, `%timeit`)?"
+How do you debug Python code within Jupyter Notebooks?
+How do you version control Jupyter Notebooks? (Challenges and best practices)
+What are some extensions and plugins that enhance the functionality of Jupyter Notebooks/Lab?
+"How do you export Jupyter Notebooks to different formats (e.g., HTML, PDF, Python script, slides)?"
+Explain the typical data science workflow in Python from data loading to model deployment.
+Describe the steps involved in data exploration and cleaning in Python.
+How do you approach feature engineering in Python using Pandas and scikit-learn?
+Explain different strategies for handling imbalanced datasets in Python.
+How do you select and evaluate machine learning models in Python?
+Describe how you would deploy a machine learning model built in Python.
+"What are some best practices for writing clean, modular, and maintainable Python code for data science projects?"
+How do you document your Python code and data science projects effectively?
+How do you collaborate with others on data science projects using Python and version control?
+How do you ensure reproducibility in your data science work using Python?
+What are some common mistakes to avoid when working with Python for data science?
+How do you stay up-to-date with the latest advancements in Python data science libraries and best practices?
+"If you encounter a performance issue in your Python data science code, how would you approach debugging and optimization?"
+Imagine you are given a new dataset in CSV format. What would be your first steps using Python and Pandas?
+"How would you handle a large dataset in Python that doesn't fit into memory? (Briefly mention techniques like chunking, Dask, Spark)"
+Describe your experience with Python in previous data science projects. (Be prepared to discuss specific libraries and techniques used)
+"If you were to teach someone the basics of Python for data science, what would be the key topics you would cover?"
+What are your favorite Python libraries for data science and why?
+"How comfortable are you with using SQL in conjunction with Python for data analysis? (Mention libraries like `pandasql`, `SQLAlchemy`)"
+"Have you used cloud-based Python environments or platforms for data science? (e.g., Google Colab, AWS SageMaker, Azure Notebooks)"
+Explain the concept of API interaction in Python and its relevance to data science. (Mention `requests` library)
+What is web scraping using Python and BeautifulSoup or Scrapy? What are ethical considerations?
+How would you approach building a simple data pipeline using Python? (Conceptual overview)
+Describe your understanding of testing and validation in Python data science projects.
+"What are some limitations of using Python for data science, and when might you consider other tools or languages?"
+How do you ensure data quality and handle data inconsistencies in Python-based data science projects?
+Explain the importance of version control (Git) in Python-based data science workflows.
+What are some common Python design patterns that are useful in data science code?
+How do you approach documenting your Python code for data science projects?
+"What are some Python libraries for geospatial data analysis? (Briefly mention GeoPandas, Shapely)"
+"What are some Python libraries for time series analysis beyond basic Pandas functionality? (Briefly mention statsmodels, Prophet)"
+"What are some Python libraries for natural language processing (NLP)? (Briefly mention NLTK, spaCy, transformers)"
+"What are some Python libraries for computer vision? (Briefly mention OpenCV, Pillow, scikit-image)"
+How would you approach a data science problem from end-to-end using Python? (From problem definition to solution deployment)
+Describe a complex data science project you implemented using Python and highlight your contributions and the Python libraries used.
+"If you were to design a Python library for a specific data science task, what would be its key features and functionalities?"
+How do you ensure the scalability and efficiency of Python code when dealing with large datasets in a data science context?
+"What are some advanced Python concepts (e.g., metaclasses, asynchronous programming, C extensions) that might be relevant in certain data science scenarios?"
+"How do you integrate Python with other technologies or systems in a data science environment? (e.g., databases, APIs, cloud platforms)"
+What are some ethical considerations specific to using Python in data science and AI projects?
+How do you handle sensitive data and ensure data privacy in Python data science projects?
+What are some security best practices to follow when developing and deploying Python-based data science applications?
+"If you were leading a Python-focused data science team, what would be your key priorities for code quality, collaboration, and innovation?"
+How do you evaluate the Python skills of a data science candidate in an interview setting?
+"What are some common mistakes junior data scientists make when writing Python code, and how can they be avoided?"
+What is SQL?
+What are the different types of SQL commands?
+"Explain the difference between DDL, DML, DCL, and TCL."
+What is a database?
+What is a table in SQL?
+What is a column and a row in a SQL table?
+What is a primary key?
+What is a foreign key?
+What is a unique key?
+What is the purpose of constraints in SQL?
+Explain the NOT NULL constraint.
+What is the CHECK constraint?
+What is an index in SQL and why is it used?
+"What are the different types of indexes in SQL? (e.g., clustered, non-clustered)"
+How do indexes improve query performance?
+When should you create indexes and when should you avoid them?
+What is normalization in database design?
+"Explain the different normal forms (1NF, 2NF, 3NF)."
+What is denormalization and when is it appropriate?
+What is a data warehouse?
+What is an ETL process?
+What is a data lake?
+Write a basic SQL query to select all columns and rows from a table named 'employees'.
+Write a SQL query to select only the 'first_name' and 'last_name' columns from the 'employees' table.
+How do you filter data using the WHERE clause?
+Write a SQL query to select employees whose 'department' is 'Sales'.
+"How do you use comparison operators in the WHERE clause? (e.g., =, >, <, >=, <=, !=)"
+"Explain the use of logical operators AND, OR, and NOT in the WHERE clause."
+Write a SQL query to select employees who are in 'Sales' department AND have a 'salary' greater than 50000.
+How do you use the BETWEEN operator to filter data within a range?
+Write a SQL query to select employees whose 'hire_date' is between '2020-01-01' and '2020-12-31'.
+Explain the use of the IN operator to filter data based on a list of values.
+Write a SQL query to select employees whose 'department' is either 'Sales' or 'Marketing'.
+How do you use the LIKE operator for pattern matching in strings?
+Write a SQL query to select employees whose 'last_name' starts with 'S'.
+"Explain the wildcards used with LIKE (e.g., %, _)."
+How do you sort data using the ORDER BY clause?
+Write a SQL query to select all employees and order them by 'last_name' in ascending order.
+How do you sort data in descending order?
+Write a SQL query to select all employees and order them by 'salary' in descending order.
+How do you order by multiple columns?
+"Write a SQL query to select all employees, order by 'department' in ascending order, and then by 'last_name' in ascending order."
+What is the purpose of the LIMIT clause?
+Write a SQL query to select the top 5 highest-paid employees.
+How do you use the DISTINCT keyword?
+Write a SQL query to select all distinct departments from the 'employees' table.
+What are aggregate functions in SQL?
+"Name some common aggregate functions (e.g., COUNT, SUM, AVG, MIN, MAX)."
+Explain the COUNT() function. How do you count all rows vs. count non-NULL values?
+Write a SQL query to count the total number of employees.
+Write a SQL query to count the number of employees in each 'department'.
+Explain the GROUP BY clause and its purpose.
+How does the GROUP BY clause work with aggregate functions?
+Write a SQL query to find the average salary for each 'department'.
+Write a SQL query to find the maximum salary in each 'department'.
+What is the HAVING clause and how is it different from the WHERE clause?
+When do you use the HAVING clause?
+Write a SQL query to find departments with an average salary greater than 60000.
+What are SQL JOINs?
+"Explain the different types of JOINs: INNER JOIN, LEFT JOIN, RIGHT JOIN, FULL OUTER JOIN."
+What is an INNER JOIN? When do you use it?
+Write a SQL query to join the 'employees' table with the 'departments' table to retrieve employee names and their department names.
+What is a LEFT JOIN (or LEFT OUTER JOIN)? When do you use it?
+"Write a SQL query to retrieve all employees and their department names, including employees who are not assigned to any department (using LEFT JOIN)."
+What is a RIGHT JOIN (or RIGHT OUTER JOIN)? When do you use it?
+What is a FULL OUTER JOIN? When do you use it?
+What is a self-join? When is it useful?
+Write a SQL query to find employees who have the same salary as another employee in the same table (self-join).
+What are subqueries (or nested queries) in SQL?
+When are subqueries useful?
+Write a SQL query to find employees who earn more than the average salary (using a subquery).
+Explain correlated subqueries and non-correlated subqueries.
+What is the EXISTS operator and how is it used with subqueries?
+What is the IN operator and how is it used with subqueries?
+What are SQL window functions?
+Explain the concept of partitioning in window functions (PARTITION BY clause).
+Explain the concept of ordering in window functions (ORDER BY clause).
+"Describe some common window functions (e.g., RANK(), DENSE_RANK(), ROW_NUMBER(), LAG(), LEAD())."
+Write a SQL query to rank employees within each department based on their salary using RANK() window function.
+What is the difference between RANK() and DENSE_RANK()?
+What is the ROW_NUMBER() window function?
+Explain the LAG() and LEAD() window functions and their use cases.
+How do you handle NULL values in SQL?
+What is the IS NULL and IS NOT NULL condition?
+How do you use the COALESCE() function to handle NULL values?
+"What are common SQL data types? (e.g., INT, VARCHAR, DATE, DATETIME, DECIMAL, BOOLEAN)"
+Explain the difference between VARCHAR and CHAR data types.
+What are DATE and DATETIME data types and how are they different?
+"How do you convert data from one data type to another? (CAST, CONVERT)"
+"Explain common string functions in SQL (e.g., UPPER(), LOWER(), SUBSTRING(), TRIM(), CONCAT())."
+"Explain common date functions in SQL (e.g., YEAR(), MONTH(), DAY(), DATE_ADD(), DATE_SUB())."
+What are SQL transactions?
+"Explain the ACID properties of transactions (Atomicity, Consistency, Isolation, Durability)."
+What are COMMIT and ROLLBACK commands in transactions?
+What is transaction isolation level?
+What are stored procedures in SQL? Why are they used?
+How do you create and execute a stored procedure?
+What are user-defined functions (UDFs) in SQL?
+How do you create and use a user-defined function?
+What is dynamic SQL and what are its risks?
+How can you prevent SQL injection attacks?
+Explain the purpose of the SQL EXPLAIN PLAN (or similar commands for different databases).
+How do you optimize SQL queries for performance?
+What are some common performance bottlenecks in SQL queries?
+What are temporary tables in SQL and when are they useful?
+What are Common Table Expressions (CTEs) in SQL? Why are they useful?
+Write a SQL query using a CTE to solve a hierarchical data problem.
+What are recursive CTEs?
+When would you use a recursive CTE?
+What are SQL triggers?
+When are SQL triggers typically used?
+What are cursors in SQL? (And why are they generally discouraged in favor of set-based operations)
+Explain set-based operations vs. row-based operations in SQL and why set-based is generally preferred for performance.
+"How do you handle errors in SQL? (e.g., using TRY-CATCH blocks)"
+What is database backup and recovery?
+"Explain different types of database backups (e.g., full, differential, incremental)."
+What is database restoration?
+How do you monitor database performance?
+What are database permissions and roles? How do you manage user access?
+"What are some common SQL dialects? (e.g., MySQL, PostgreSQL, SQL Server, Oracle SQL)"
+What are the key differences between different SQL dialects?
+"If you were given a poorly performing SQL query, how would you approach optimizing it?"
+Describe a time you had to write a complex SQL query to solve a data analysis problem.
+How do you ensure data quality and consistency when working with SQL databases?
+How do you collaborate with others when working on SQL scripts and database projects?
+What are your preferred SQL development tools and environments?
