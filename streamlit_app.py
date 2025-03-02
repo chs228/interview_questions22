@@ -218,27 +218,7 @@ if not os.path.exists(csv_file):
     st.stop()
 
 # Sidebar for app settings
-with st.sidebar:
-    st.header("Quiz Settings")
-    
-    # Display information about the questions file
-    try:
-        questions_df = pd.read_csv(csv_file)
-        st.success(f"✅ Questions loaded: {len(questions_df)} questions available")
-        with st.expander("Preview Questions"):
-            st.dataframe(questions_df.head(3))
-    except Exception as e:
-        st.error(f"Error loading questions file: {e}")
-    
-    # Email settings
-    st.subheader("Email Configuration")
-    sender_email = st.text_input("Sender Email", "projecttestingsubhash@gmail.com")
-    sender_password = st.text_input("App Password", "zgwynxksfnwzusyk", type="password")
-    
-    # App info
-    st.markdown("---")
-    st.caption("Quiz Generator v1.0")
-    st.caption("© 2025 Quiz Systems")
+ 
 
 # Main content
 st.markdown("### Request Your Quiz Paper")
