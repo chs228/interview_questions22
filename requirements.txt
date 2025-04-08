@@ -1,27 +1,14 @@
-# Core Framework
-streamlit>=1.19.0
-
-# Language Model (must come right after spaCy)
-spacy>=3.4.3
-https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.5.0/en_core_web_sm-3.5.0-py3-none-any.whl
-
-# File Processing
-PyPDF2>=2.12.1
-python-docx>=0.8.11
-fpdf>=1.7.2
-
-# NLP and ML Libraries
-nltk>=3.7
-scikit-learn>=1.2.0
-numpy>=1.23.5
-transformers>=4.26.0
-
-# Email Support
-secure-smtplib>=0.1.1
-
-# Web Requests
-requests>=2.28.2
-
-# Optional - Uncomment if needed
-# torch>=1.13.1
-# tensorflow>=2.11.0
+streamlit==1.32.0
+numpy==1.26.4
+cython==3.0.10
+thinc==8.2.5
+spacy==3.7.4
+PyPDF2==3.0.1
+python-docx==1.1.0
+fpdf==1.7.2
+nltk==3.8.1
+scikit-learn==1.4.2
+transformers==4.39.3
+torch==2.2.2
+sentence-transformers==2.6.1
+https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1-py3-none-any.whl
