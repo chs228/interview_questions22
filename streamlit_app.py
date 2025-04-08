@@ -7,6 +7,7 @@ import requests
 import os
 import random
 from datetime import datetime
+import en_core_web_sm
 
 # For PDF and DOCX processing
 try:
@@ -45,7 +46,9 @@ try:
     
     # Load spaCy model
     try:
-        nlp = spacy.load("en_core_web_sm")
+        nlp = en_core_web_sm.load()
+
+ 
     except:
         st.warning("Installing spaCy model (this will only happen once)...")
         import subprocess
