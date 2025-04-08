@@ -1,3 +1,27 @@
-streamlit 
-pandas 
-fpdf
+# Core Framework
+streamlit>=1.19.0
+
+# File Processing
+PyPDF2>=2.12.1
+python-docx>=0.8.11
+fpdf>=1.7.2
+
+# NLP and ML Libraries
+nltk>=3.7
+spacy>=3.4.3
+scikit-learn>=1.2.0
+numpy>=1.23.5
+transformers>=4.26.0
+
+# Email Support
+secure-smtplib>=0.1.1
+
+# Web Requests
+requests>=2.28.2
+
+# Optional - Uncomment if needed
+# torch>=1.13.1  # Required for some transformers functionality
+# tensorflow>=2.11.0  # Alternative for some NLP tasks
+
+# Command to install spaCy language model
+# Run after pip install: python -m spacy download en_core_web_sm
