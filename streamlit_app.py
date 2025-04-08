@@ -46,7 +46,13 @@ try:
     
     # Load spaCy model
     try:
-        nlp = en_core_web_sm.load()
+        import spacy
+        try:
+            nlp = spacy.load("en_core_web_sm")
+        except:
+            from spacy.cli import download
+            download("en_core_web_sm")
+            nlp = spacy.load("en_core_web_sm")
 
  
     except:
