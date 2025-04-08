@@ -28,51 +28,59 @@ from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 
 # NLP Modules
+# Prioritize NLP packages with better error handling
 try:
     import spacy
     import nltk
-    from nltk.tokenize import word_tokenize
+    from nltk.tokenize import word_tokenize, sent_tokenize
     from nltk.corpus import stopwords
     from nltk.stem import WordNetLemmatizer
-    from sklearn.feature_extraction.text import TfidfVectorizer
+    from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
     from sklearn.metrics.pairwise import cosine_similarity
     from transformers import pipeline, AutoTokenizer, AutoModelForSequenceClassification
     import numpy as np
     
-    # Download necessary NLTK resources
+    # Add newer NLP packages
+    import torch
+    from sentence_transformers import SentenceTransformer
+    
+    # Download resources once
     nltk.download('punkt', quiet=True)
     nltk.download('stopwords', quiet=True)
     nltk.download('wordnet', quiet=True)
+    nltk.download('averaged_perceptron_tagger', quiet=True)
     
-    # Load spaCy model
+    # Load spaCy model - try larger model first, fall back to smaller one
     try:
-        import spacy
+        nlp = spacy.load("en_core_web_md")  # Medium model with word vectors
+    except:
         try:
             nlp = spacy.load("en_core_web_sm")
         except:
-            from spacy.cli import download
-            download("en_core_web_sm")
+            import subprocess
+            subprocess.run(["python", "-m", "spacy", "download", "en_core_web_sm"])
             nlp = spacy.load("en_core_web_sm")
-
- 
-    except:
-        st.warning("Installing spaCy model (this will only happen once)...")
-        import subprocess
-        subprocess.run(["python", "-m", "spacy", "download", "en_core_web_sm"])
-        nlp = spacy.load("en_core_web_sm")
     
-    # Initialize sentiment analysis pipeline
+    # Initialize more advanced NLP components
     try:
+        # Sentence embeddings model for semantic similarity
+        sentence_model = SentenceTransformer('all-MiniLM-L6-v2')
+        
+        # Multiple NLP pipelines for different tasks
         sentiment_analyzer = pipeline("sentiment-analysis")
-    except:
-        sentiment_analyzer = None
-        st.warning("Transformers models couldn't be loaded. Some NLP features will be limited.")
+        token_classifier = pipeline("token-classification", aggregation_strategy="simple")
+        text_classifier = pipeline("text-classification", model="distilbert-base-uncased-finetuned-sst-2-english")
+        
+        ADVANCED_NLP_ENABLED = True
+    except Exception as e:
+        st.warning(f"Advanced NLP models couldn't be loaded: {e}. Using basic models instead.")
+        ADVANCED_NLP_ENABLED = False
         
     NLP_ENABLED = True
-except ImportError:
-    st.warning("Some NLP packages are not installed. Using basic text processing instead.")
+except ImportError as e:
+    st.warning(f"Some NLP packages are not installed: {e}. Using basic text processing instead.")
     NLP_ENABLED = False
-
+    ADVANCED_NLP_ENABLED = False
 # Define skills dictionary
 COMMON_SKILLS = {
     'programming': ['python', 'java', 'javascript', 'html', 'css', 'c++', 'c#', 'ruby', 'php', 'sql', 'r', 'golang', 'rust', 'swift', 'kotlin'],
@@ -285,7 +293,37 @@ def preprocess_text(text):
     tokens = [lemmatizer.lemmatize(word) for word in tokens]
     
     return " ".join(tokens)
-
+def recognize_entities_in_answer(answer):
+    """Extract named entities from the answer for context-aware feedback"""
+    if not NLP_ENABLED:
+        return {}
+    
+    try:
+        doc = nlp(answer)
+        entities = {}
+        
+        # Extract entities by type
+        for ent in doc.ents:
+            if ent.label_ not in entities:
+                entities[ent.label_] = []
+            entities[ent.label_].append(ent.text)
+        
+        # Look for technical terms
+        technical_terms = []
+        for token in doc:
+            if token.pos_ in ["NOUN", "PROPN"] and not token.is_stop:
+                for category, skills in COMMON_SKILLS.items():
+                    if any(skill in token.text.lower() for skill in skills):
+                        technical_terms.append(token.text)
+                        break
+        
+        if technical_terms:
+            entities["TECH"] = technical_terms
+        
+        return entities
+    except Exception as e:
+        st.error(f"Error in entity recognition: {str(e)}")
+        return {}
 def extract_entities_with_nlp(text):
     """Extract named entities and potential skills from resume text using spaCy"""
     if not NLP_ENABLED or not text:
@@ -363,65 +401,110 @@ def calculate_answer_similarity(expected_keywords, answer):
         return 0.5
 
 def extract_skills_with_nlp(text):
-    """Extract skills from resume using NLP techniques"""
+    """Extract skills from resume using advanced NLP techniques"""
     if not NLP_ENABLED:
         return extract_skills(text)  # Fallback to basic extraction
     
-    preprocessed_text = preprocess_text(text)
     identified_skills = {}
     
     # Process text with spaCy
     doc = nlp(text)
     
-    # Extract potential skill candidates using noun chunks and named entities
+    # Extract potential skill candidates
     skill_candidates = set()
     
-    # Add noun chunks
+    # Extract noun phrases, entities, and technical terms
     for chunk in doc.noun_chunks:
-        skill_candidates.add(chunk.text.lower())
+        if len(chunk.text.strip()) > 2:  # Avoid single letters/numbers
+            skill_candidates.add(chunk.text.lower())
     
     # Add named entities of relevant types
     for ent in doc.ents:
         if ent.label_ in ["ORG", "PRODUCT", "WORK_OF_ART", "GPE"]:
             skill_candidates.add(ent.text.lower())
     
-    # Add all tokens that might be technical terms
+    # Extract potential technical terms using POS patterns
     for token in doc:
+        # Look for technical terms that are nouns or proper nouns
         if (token.pos_ in ["NOUN", "PROPN"] and 
             not token.is_stop and 
-            len(token.text) > 1):
+            len(token.text) > 2):
             skill_candidates.add(token.text.lower())
     
-    # Match with known skills from common skills dictionary
-    for category, skill_list in COMMON_SKILLS.items():
-        found_skills = []
-        for skill in skill_list:
-            # Look for exact match
-            if skill in preprocessed_text:
-                found_skills.append(skill)
-                continue
-                
-            # Look for skill chunks
-            for candidate in skill_candidates:
-                if (skill == candidate or 
-                    skill in candidate.split() or 
-                    candidate in skill.split()):
-                    found_skills.append(skill)
-                    break
+    # Use sentence transformer for semantic matching if available
+    if ADVANCED_NLP_ENABLED and 'sentence_model' in globals():
+        # Get embeddings for all skill candidates
+        candidate_embeddings = sentence_model.encode([cand for cand in skill_candidates])
         
-        if found_skills:
-            identified_skills[category] = list(set(found_skills))
+        # Match with known skills using semantic similarity
+        for category, skill_list in COMMON_SKILLS.items():
+            found_skills = []
+            skill_embeddings = sentence_model.encode(skill_list)
+            
+            # Calculate similarities
+            for i, candidate in enumerate(skill_candidates):
+                candidate_emb = candidate_embeddings[i]
+                similarities = cosine_similarity([candidate_emb], skill_embeddings)[0]
+                
+                # Find highest similarity
+                max_sim_idx = np.argmax(similarities)
+                max_sim = similarities[max_sim_idx]
+                
+                # If similarity is high enough, add the skill
+                if max_sim > 0.75:  # Threshold for semantic similarity
+                    found_skills.append(skill_list[max_sim_idx])
+                # Also add exact matches
+                elif candidate in skill_list:
+                    found_skills.append(candidate)
+            
+            if found_skills:
+                identified_skills[category] = list(set(found_skills))
+    else:
+        # Fallback to basic matching
+        for category, skill_list in COMMON_SKILLS.items():
+            found_skills = []
+            for skill in skill_list:
+                for candidate in skill_candidates:
+                    if (skill == candidate or 
+                        skill in candidate.split() or 
+                        candidate in skill.split()):
+                        found_skills.append(skill)
+                        break
+            
+            if found_skills:
+                identified_skills[category] = list(set(found_skills))
+    
+    # Look for skill context using dependency parsing
+    if len(identified_skills) < 3:  # If we don't have enough skills yet
+        # Look for sentences mentioning experience, knowledge, skills, etc.
+        skill_context_terms = ["experience", "knowledge", "skill", "proficient", "expertise"]
+        for sent in doc.sents:
+            if any(term in sent.text.lower() for term in skill_context_terms):
+                # Process this sentence more carefully
+                sent_doc = nlp(sent.text)
+                for token in sent_doc:
+                    # Focus on technical-looking terms
+                    if (token.pos_ in ["NOUN", "PROPN"] and 
+                        not token.is_stop and 
+                        len(token.text) > 2):
+                        # Check if it's in any skill list
+                        for category, skill_list in COMMON_SKILLS.items():
+                            # Use token.lemma_ to match base forms
+                            if any(skill in token.lemma_.lower() for skill in skill_list):
+                                if category not in identified_skills:
+                                    identified_skills[category] = []
+                                for skill in skill_list:
+                                    if skill in token.lemma_.lower():
+                                        identified_skills[category].append(skill)
     
     return identified_skills
-
 # Enhanced answer evaluation function 
 def evaluate_answer_with_nlp(question, answer, expected_keywords):
     """
-    Evaluate the candidate's answer using NLP techniques including:
-    - Keyword presence
-    - Answer sentiment analysis
-    - Content similarity
-    - Technical depth estimation
+    Evaluate answer using advanced NLP techniques including:
+    - Semantic similarity with expected keywords
+    - Topic modeling and key concept extraction
+    - Sentiment and confidence analysis
     """
     if not answer.strip():
         return {
@@ -431,10 +514,10 @@ def evaluate_answer_with_nlp(question, answer, expected_keywords):
         }
     
     # Basic keyword matching (fallback if no NLP)
-    keyword_count = sum(1 for keyword in expected_keywords if keyword.lower() in answer.lower())
-    basic_score = min(keyword_count / max(len(expected_keywords), 1), 1.0) * 100
-    
     if not NLP_ENABLED:
+        keyword_count = sum(1 for keyword in expected_keywords if keyword.lower() in answer.lower())
+        basic_score = min(keyword_count / max(len(expected_keywords), 1), 1.0) * 100
+        
         missing = [k for k in expected_keywords if k.lower() not in answer.lower()]
         return {
             "score": basic_score,
@@ -443,68 +526,166 @@ def evaluate_answer_with_nlp(question, answer, expected_keywords):
         }
     
     try:
-        # Process text
-        preprocessed_answer = preprocess_text(answer)
+        # Process text with spaCy
+        answer_doc = nlp(answer)
         
-        # Sentiment and confidence analysis
-        sentiment = analyze_answer_sentiment(answer)
-        confidence_score = sentiment["score"] * 25  # 0-25 points for confidence
+        # Enhanced semantic similarity using sentence transformers
+        if ADVANCED_NLP_ENABLED and 'sentence_model' in globals():
+            # Create sentences for semantic analysis
+            expected_text = " ".join(expected_keywords)
+            
+            # Get embeddings
+            answer_embedding = sentence_model.encode(answer)
+            expected_embedding = sentence_model.encode(expected_text)
+            
+            # Calculate semantic similarity
+            semantic_similarity = cosine_similarity([answer_embedding], [expected_embedding])[0][0]
+            semantic_score = semantic_similarity * 50  # 0-50 points for semantic similarity
+        else:
+            # Fallback to TF-IDF similarity
+            documents = [" ".join(expected_keywords), answer]
+            vectorizer = TfidfVectorizer()
+            tfidf_matrix = vectorizer.fit_transform(documents)
+            semantic_similarity = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:2])[0][0]
+            semantic_score = semantic_similarity * 50
+            
+        # Extract key phrases and concepts from answer
+        key_phrases = []
+        for chunk in answer_doc.noun_chunks:
+            if not all(token.is_stop for token in chunk):
+                key_phrases.append(chunk.text.lower())
         
-        # Content similarity using TF-IDF and cosine similarity
-        similarity = calculate_answer_similarity(expected_keywords, preprocessed_answer)
-        similarity_score = similarity * 50  # 0-50 points for content
+        # Extract entities
+        entities = [ent.text.lower() for ent in answer_doc.ents]
         
-        # Technical depth estimation based on length and keyword density
-        words = answer.split()
+        # Analyze technical depth
+        # - Count non-stopwords
+        # - Count technical terms
+        tech_terms_count = 0
+        technical_term_candidates = key_phrases + entities
+        for term in technical_term_candidates:
+            for category in COMMON_SKILLS.values():
+                if any(skill in term for skill in category):
+                    tech_terms_count += 1
+                    break
+        
+        # Technical depth score based on length and keyword density
+        words = [token.text for token in answer_doc if not token.is_stop]
         optimal_length = 150  # Optimal answer length (approx)
+        
+        # Penalize both too short and too long answers
         length_factor = min(len(words) / optimal_length, 2.0)
         if length_factor > 1:
-            length_factor = 2 - length_factor  # Penalize too long answers
-        technical_score = length_factor * 25  # 0-25 points for technical depth
+            length_factor = 2 - length_factor  # Penalize too long answers (inverted U curve)
+            
+        # Calculate technical depth score
+        tech_density = tech_terms_count / max(1, len(words)) * 10  # Normalize technical term density
+        technical_score = (length_factor * 0.7 + tech_density * 0.3) * 25  # 0-25 points
+        
+        # Sentiment and confidence analysis
+        if ADVANCED_NLP_ENABLED and 'sentiment_analyzer' in globals():
+            # Use transformer-based sentiment analysis
+            result = sentiment_analyzer(answer[:512])[0]  # Limit text length
+            
+            # Map sentiment to confidence
+            sentiment_label = result["label"]
+            sentiment_score = result["score"]
+            
+            if sentiment_label == "POSITIVE":
+                confidence_score = sentiment_score * 25  # More positive = more confident
+            else:
+                confidence_score = (1 - sentiment_score) * 25  # Less negative = more confident
+        else:
+            # Simple confidence markers analysis
+            confidence_markers = ["confident", "sure", "know", "certain", "definitely"]
+            uncertainty_markers = ["maybe", "perhaps", "guess", "not sure", "might", "could be"]
+            
+            answer_lower = answer.lower()
+            confidence_count = sum(1 for marker in confidence_markers if marker in answer_lower)
+            uncertainty_count = sum(1 for marker in uncertainty_markers if marker in answer_lower)
+            
+            if confidence_count > uncertainty_count:
+                confidence_score = 20
+            elif uncertainty_count > confidence_count:
+                confidence_score = 10
+            else:
+                confidence_score = 15
         
         # Combined score
-        total_score = confidence_score + similarity_score + technical_score
+        total_score = semantic_score + technical_score + confidence_score
         score = min(round(total_score), 100)
         
-        # Identify missing concepts
-        doc = nlp(preprocessed_answer)
-        answer_concepts = set()
-        for token in doc:
-            answer_concepts.add(token.lemma_.lower())
-        for chunk in doc.noun_chunks:
-            answer_concepts.add(chunk.text.lower())
-        
+        # Identify missing concepts with enhanced semantic analysis
         missing_concepts = []
+        
+        # Extract key concepts from answer using NLP
+        answer_concepts = set()
+        for token in answer_doc:
+            if not token.is_stop and token.pos_ in ["NOUN", "VERB", "ADJ"]:
+                answer_concepts.add(token.lemma_.lower())
+        
+        for chunk in answer_doc.noun_chunks:
+            if not all(token.is_stop for token in chunk):
+                answer_concepts.add(chunk.text.lower())
+        
+        # Check for each expected keyword
         for keyword in expected_keywords:
             keyword_found = False
             keyword_lower = keyword.lower()
             
-            # Check for direct match
-            if keyword_lower in preprocessed_answer:
+            # Direct string match
+            if keyword_lower in answer.lower():
                 keyword_found = True
+                continue
             
             # Check for semantic similarity using spaCy
-            if not keyword_found:
-                keyword_doc = nlp(keyword_lower)
-                for concept in answer_concepts:
-                    concept_doc = nlp(concept)
-                    if keyword_doc.similarity(concept_doc) > 0.8:
-                        keyword_found = True
-                        break
+            keyword_doc = nlp(keyword_lower)
+            best_similarity = 0
+            
+            for concept in answer_concepts:
+                concept_doc = nlp(concept)
+                similarity = keyword_doc.similarity(concept_doc)
+                best_similarity = max(similarity, best_similarity)
+                
+                if similarity > 0.75:  # Threshold for semantic similarity
+                    keyword_found = True
+                    break
+            
+            # If still not found but there's some similarity, consider it "partially covered"
+            if not keyword_found and best_similarity > 0.5:
+                keyword_found = True  # Partial credit for related concepts
             
             if not keyword_found:
                 missing_concepts.append(keyword)
         
-        # Generate feedback
+        # Generate intelligent feedback
         if score >= 80:
-            feedback = "Excellent answer that demonstrates strong understanding of the concepts. You provided a comprehensive explanation with good technical depth."
+            feedback = "Excellent answer that demonstrates strong understanding of the concepts. "
+            if semantic_score > 40:
+                feedback += "You covered all the key points effectively. "
+            if technical_score > 20:
+                feedback += "Your explanation has good technical depth. "
+            if confidence_score > 20:
+                feedback += "You presented your answer with clarity and confidence. "
         elif score >= 60:
-            feedback = "Good answer that covers some key concepts, but could be improved with more technical details and depth."
+            feedback = "Good answer that covers many of the important concepts. "
+            if semantic_score < 30:
+                feedback += "Try to address more of the key points directly. "
+            if technical_score < 15:
+                feedback += "Consider adding more technical details to strengthen your answer. "
+            if confidence_score < 15:
+                feedback += "Try to present your answer with more certainty. "
         else:
-            feedback = "Your answer needs improvement. Try to incorporate more technical concepts and provide clearer explanations."
+            feedback = "Your answer needs improvement. "
+            if semantic_score < 25:
+                feedback += "It doesn't adequately address the key concepts of the question. "
+            if technical_score < 12:
+                feedback += "Try to include more technical details and specifics. "
+            if confidence_score < 10:
+                feedback += "Work on presenting your answer more confidently. "
         
         if missing_concepts:
-            feedback += " Consider including information about " + ", ".join(missing_concepts[:3]) + "."
+            feedback += "Consider including information about " + ", ".join(missing_concepts[:3]) + "."
         
         return {
             "score": score,
@@ -514,13 +695,15 @@ def evaluate_answer_with_nlp(question, answer, expected_keywords):
     except Exception as e:
         st.error(f"Error in NLP evaluation: {str(e)}")
         # Fall back to basic evaluation
+        keyword_count = sum(1 for keyword in expected_keywords if keyword.lower() in answer.lower())
+        basic_score = min(keyword_count / max(len(expected_keywords), 1), 1.0) * 100
         missing = [k for k in expected_keywords if k.lower() not in answer.lower()]
         return {
             "score": basic_score,
             "feedback": "Based on basic analysis, your answer covers some key concepts.",
             "missing_concepts": missing
         }
-
+        
 # Enhanced validate_answer with new NLP capabilities or fallback to Gemini
 def validate_answer_with_gemini(question, answer, expected_keywords):
     """
@@ -661,8 +844,10 @@ def extract_skills(text):
 
 # Completing the generate_technical_questions function
 def generate_technical_questions(skills, max_questions=7):
+    """Generate technical questions based on extracted skills using NLP"""
     all_possible_questions = []
     
+    # Flatten and count skills by frequency
     all_skills = []
     for category, skill_list in skills.items():
         all_skills.extend(skill_list)
@@ -671,26 +856,83 @@ def generate_technical_questions(skills, max_questions=7):
     for skill in all_skills:
         skill_frequency[skill] = skill_frequency.get(skill, 0) + 1
     
+    # Sort skills by frequency (most mentioned first)
     sorted_skills = sorted(skill_frequency.keys(), key=lambda x: skill_frequency[x], reverse=True)
     
-    # Generate questions from our question bank
-    for skill in sorted_skills:
-        # First check for direct skill match
-        if skill in TECHNICAL_QUESTIONS:
-            all_possible_questions.extend(TECHNICAL_QUESTIONS[skill])
-        else:
-            # Check for partial matches
+    if NLP_ENABLED:
+        # Use NLP to find semantic matches for skills without direct question matches
+        skills_without_questions = []
+        
+        # First pass - direct matches
+        for skill in sorted_skills:
+            if skill in TECHNICAL_QUESTIONS:
+                # Get questions for direct skill match
+                skill_questions = TECHNICAL_QUESTIONS[skill].copy()
+                
+                # Prioritize questions with higher keyword overlap
+                if len(skills) > 1:
+                    # Calculate how many other skills are mentioned in each question
+                    for q in skill_questions:
+                        q_text = q["question"].lower()
+                        other_skill_count = sum(1 for s in all_skills if s != skill and s in q_text)
+                        q["relevance_score"] = other_skill_count + 1
+                    
+                    # Sort by relevance
+                    skill_questions.sort(key=lambda x: x.get("relevance_score", 0), reverse=True)
+                
+                # Add questions with original order preserved
+                all_possible_questions.extend(skill_questions)
+            else:
+                skills_without_questions.append(skill)
+        
+        # Second pass - semantic matching for skills without direct questions
+        for skill in skills_without_questions:
+            best_match = None
+            best_score = 0
+            
+            # Create a spaCy doc for this skill
+            skill_doc = nlp(skill)
+            
+            # Find most similar technical question category
             for tech_skill in TECHNICAL_QUESTIONS.keys():
-                if tech_skill in skill or skill in tech_skill:
-                    all_possible_questions.extend(TECHNICAL_QUESTIONS[tech_skill])
-                    break
+                tech_skill_doc = nlp(tech_skill)
+                similarity = skill_doc.similarity(tech_skill_doc)
+                
+                if similarity > best_score and similarity > 0.6:  # Threshold
+                    best_score = similarity
+                    best_match = tech_skill
+            
+            # If we found a good match, add those questions
+            if best_match:
+                all_possible_questions.extend(TECHNICAL_QUESTIONS[best_match])
+    else:
+        # Fallback to direct matching and partial matching
+        for skill in sorted_skills:
+            # First check for direct skill match
+            if skill in TECHNICAL_QUESTIONS:
+                all_possible_questions.extend(TECHNICAL_QUESTIONS[skill])
+            else:
+                # Check for partial matches
+                for tech_skill in TECHNICAL_QUESTIONS.keys():
+                    if tech_skill in skill or skill in tech_skill:
+                        all_possible_questions.extend(TECHNICAL_QUESTIONS[tech_skill])
+                        break
     
     # Add generic questions
     all_possible_questions.extend(GENERIC_QUESTIONS)
     
+    # Remove duplicates while preserving order
+    seen = set()
+    unique_questions = []
+    for q in all_possible_questions:
+        q_text = q["question"]
+        if q_text not in seen:
+            seen.add(q_text)
+            unique_questions.append(q)
+    
     # Shuffle and limit number of questions
-    random.shuffle(all_possible_questions)
-    return all_possible_questions[:max_questions]
+    random.shuffle(unique_questions)
+    return unique_questions[:max_questions]
 
 def generate_feedback_report(interview_results):
     """Generate a comprehensive feedback report based on interview results"""
