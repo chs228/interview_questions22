@@ -7,7 +7,7 @@ import requests
 import os
 import random
 from datetime import datetime
-import en_core_web_sm
+# import en_core_web_sm
 
 # For PDF and DOCX processing
 try:
