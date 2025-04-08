@@ -722,7 +722,8 @@ def process_user_input(user_input):
             add_message("assistant", summary)
             summary_text = summary.encode()
             summary_b64 = base64.b64encode(summary_text).decode()
-            summary_link = f'<a href="data:text/markdown;base64,{summary_b64}" download="interview_results.pdf">Download Summary (Markdown)</a>'
+            
+            summary_link = f'<a href="" download="interview_results.pdf">Download Summary (Markdown)</a>'
             add_message("assistant", f"You can also download this summary: {summary_link}")
         
         elif "new" in user_input.lower() or "start" in user_input.lower() or "again" in user_input.lower():
