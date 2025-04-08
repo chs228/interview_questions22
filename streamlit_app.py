@@ -105,14 +105,14 @@ TECHNICAL_QUESTIONS = {
     ],
 }
 
-# Add generic questions that can be asked for any role
+# Add generic questions
 GENERIC_QUESTIONS = [
     {"question": "Tell me about a challenging project you worked on and how you overcame obstacles.", 
      "expected_keywords": ["challenge", "project", "solution", "overcome", "team", "result"]},
     {"question": "How do you approach learning new technologies?", 
      "expected_keywords": ["learning", "research", "practice", "curiosity", "documentation", "projects"]},
     {"question": "Describe your experience with agile development methodologies.", 
-     "expected_keywords": ["agile", "scrum", "sprint-", "kanban", "standup", "retrospective"]},
+     "expected_keywords": ["agile", "scrum", "sprint", "kanban", "standup", "retrospective"]},
     {"question": "How do you ensure code quality in your projects?", 
      "expected_keywords": ["testing", "review", "standards", "documentation", "refactoring", "clean"]}
 ]
@@ -182,37 +182,67 @@ def preprocess_text(text):
     if not NLP_ENABLED:
         return text.lower()
     
-    # Tokenize and convert to lowercase
     tokens = word_tokenize(text.lower())
-    
-    # Remove stopwords
     stop_words = set(stopwords.words('english'))
     tokens = [token for token in tokens if token not in stop_words and token.isalnum()]
-    
-    # Lemmatize
     lemmatizer = WordNetLemmatizer()
     tokens = [lemmatizer.lemmatize(token) for token in tokens]
-    
     return " ".join(tokens)
 
 def extract_skills_with_nlp(text):
-    """Extract skills using simple NLP with NLTK."""
+    """Extract skills with improved NLP and context awareness."""
     if not NLP_ENABLED:
-        return extract_skills(text)
+        return extract_skills_basic(text)
     
     processed_text = preprocess_text(text)
+    raw_text = text.lower()
     identified_skills = {}
     
+    SKILL_ALIASES = {
+        'python': ['python', 'py', 'python3'],
+        'java': ['java', 'jdk', 'jvm'],
+        'javascript': ['javascript', 'js', 'node', 'nodejs'],
+        'sql': ['sql', 'mysql', 'postgresql', 'sqlite'],
+        'aws': ['aws', 'amazon web services', 'ec2', 's3', 'lambda'],
+        'react': ['react', 'reactjs', 'jsx'],
+        'django': ['django', 'dj'],
+        'flask': ['flask'],
+        'git': ['git', 'github', 'gitlab'],
+    }
+    
     for category, skill_list in COMMON_SKILLS.items():
-        found_skills = []
+        found_skills = set()
         for skill in skill_list:
-            # Check if skill or its lemmatized form appears in processed text
-            if skill in processed_text or preprocess_text(skill) in processed_text:
-                found_skills.append(skill)
+            aliases = SKILL_ALIASES.get(skill, [skill])
+            for alias in aliases:
+                pattern = r'\b(?:experience with |worked on |using |knowledge of |proficient in )?' + re.escape(alias) + r'(?:ing|s)?\b'
+                if re.search(pattern, raw_text):
+                    found_skills.add(skill)
+                elif preprocess_text(alias) in processed_text:
+                    found_skills.add(skill)
         if found_skills:
-            identified_skills[category] = found_skills
+            identified_skills[category] = list(found_skills)
     
     return identified_skills
+
+def extract_skills_basic(text):
+    """Basic skill extraction without NLP."""
+    text = text.lower()
+    identified_skills = {}
+    for category, skill_list in COMMON_SKILLS.items():
+        found_skills = set()
+        for skill in skill_list:
+            pattern = r'\b' + re.escape(skill) + r'\b'
+            if re.search(pattern, text):
+                found_skills.add(skill)
+        if found_skills:
+            identified_skills[category] = list(found_skills)
+    return identified_skills
+
+def extract_skills(text):
+    if not text:
+        return {}
+    return extract_skills_with_nlp(text) if NLP_ENABLED else extract_skills_basic(text)
 
 def evaluate_answer_with_nlp(question, answer, expected_keywords):
     """Evaluate answer using simple NLP-based keyword matching."""
@@ -233,18 +263,13 @@ def evaluate_answer_with_nlp(question, answer, expected_keywords):
             "missing_concepts": missing
         }
     
-    # Preprocess answer and keywords
     processed_answer = preprocess_text(answer)
     processed_keywords = [preprocess_text(kw) for kw in expected_keywords]
     
-    # Count matches
     keyword_count = sum(1 for kw in processed_keywords if kw in processed_answer)
     score = min(keyword_count / len(expected_keywords), 1.0) * 100
-    
-    # Identify missing concepts
     missing = [kw for kw in expected_keywords if preprocess_text(kw) not in processed_answer]
     
-    # Generate feedback
     feedback = get_feedback_message(score)
     if missing:
         feedback += f" Consider mentioning: {', '.join(missing[:3])}."
@@ -255,9 +280,8 @@ def evaluate_answer_with_nlp(question, answer, expected_keywords):
         "missing_concepts": missing
     }
 
-# Gemini API functions with NLP fallback
+# Gemini API functions
 def validate_answer_with_gemini(question, answer, expected_keywords):
-    """Use Gemini API or fall back to simple NLP evaluation."""
     api_key = os.environ.get("GEMINI_API_KEY", st.secrets.get("GEMINI_API_KEY", ""))
     
     if not api_key:
@@ -291,11 +315,7 @@ def validate_answer_with_gemini(question, answer, expected_keywords):
     }
     
     data = {
-        "contents": [{
-            "parts": [{
-                "text": prompt
-            }]
-        }]
+        "contents": [{"parts": [{"text": prompt}]}]
     }
     
     try:
@@ -346,27 +366,6 @@ def extract_text_from_docx(docx_file):
     except Exception as e:
         st.error(f"Error processing DOCX: {e}")
         return ""
-
-def extract_skills(text):
-    if not text:
-        return {}
-    
-    if NLP_ENABLED:
-        return extract_skills_with_nlp(text)
-    
-    text = text.lower()
-    identified_skills = {}
-    
-    for category, skill_list in COMMON_SKILLS.items():
-        found_skills = []
-        for skill in skill_list:
-            pattern = r'\b' + re.escape(skill) + r'\b'
-            if re.search(pattern, text):
-                found_skills.append(skill)
-        if found_skills:
-            identified_skills[category] = found_skills
-    
-    return identified_skills
 
 def generate_technical_questions(skills, max_questions=7):
     all_possible_questions = []
@@ -525,19 +524,20 @@ def generate_interview_summary(candidate_name, interview_date, avg_score, rating
     
     summary.append("## Interview Recommendation")
     if avg_score >= 85:
-        summary.append("Based on your technical interview performance, you demonstrate strong technical knowledge and communication skills. You're ready to apply for senior positions in your area of expertise.")
+        summary.append("Based on your technical interview performance, you demonstrate strong technical knowledge and communication skills. You're ready to apply for senior positions.")
     elif avg_score >= 70:
         summary.append("Your technical skills are solid, with some areas that could benefit from deeper understanding. You're well-prepared for mid-level positions.")
     elif avg_score >= 50:
-        summary.append("You have a good foundation of technical knowledge, but should continue to build your expertise in key areas. Focus on the concepts mentioned as missing in your feedback.")
+        summary.append("You have a good foundation of technical knowledge, but should continue to build your expertise in key areas.")
     else:
-        summary.append("Consider spending more time studying the fundamentals of your technical areas. Focus particularly on the missing concepts highlighted in each question's feedback.")
+        summary.append("Consider spending more time studying the fundamentals of your technical areas.")
     
     return "\n".join(summary)
 
 # Streamlit App
 st.set_page_config(page_title="Technical Interview Chatbot", layout="wide")
 
+# Initialize session state
 if "resume_text" not in st.session_state:
     st.session_state.resume_text = ""
 if "skills" not in st.session_state:
@@ -564,11 +564,12 @@ if "max_questions" not in st.session_state:
 def add_message(role, content):
     st.session_state.chat_messages.append({"role": role, "content": content})
 
+# Sidebar for settings
 with st.sidebar:
     st.header("Interview Bot Settings")
     
-    if st.session_state.bot_state == "wait_for_resume" or st.session_state.bot_state == "analyzing_resume":
-        st.info("Please upload your resume or paste its content in the chat to begin.")
+    if st.session_state.bot_state in ["wait_for_resume", "analyzing_resume"]:
+        st.info("Please upload your resume or paste its content to begin.")
     elif st.session_state.bot_state == "interview":
         st.subheader("Interview Progress")
         progress = st.session_state.current_question_index / len(st.session_state.questions)
@@ -592,9 +593,7 @@ with st.sidebar:
         st.metric("Rating", rating)
     
     with st.expander("API Configuration"):
-        api_key = st.text_input("Gemini API Key", 
-                              value=os.environ.get("GEMINI_API_KEY", ""), 
-                              type="password")
+        api_key = st.text_input("Gemini API Key", value=os.environ.get("GEMINI_API_KEY", ""), type="password")
         if st.button("Save API Key"):
             os.environ["GEMINI_API_KEY"] = api_key
             st.success("API Key saved for this session")
@@ -615,11 +614,14 @@ with st.sidebar:
         st.session_state.candidate_name = ""
         st.rerun()
 
+# Main UI
 st.title("Technical Interview Chatbot 🤖")
 
-for message in st.session_state.chat_messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
+# Resume uploader at the top
+uploaded_file = st.file_uploader("Upload your resume (PDF or DOCX)", type=["pdf", "docx"], key="resume_upload")
+
+# Chat container below uploader
+chat_container = st.container()
 
 def process_user_input(user_input):
     add_message("user", user_input)
@@ -756,26 +758,22 @@ def process_user_input(user_input):
     elif st.session_state.bot_state == "complete":
         if "review" in user_input.lower() or "answers" in user_input.lower():
             review = "## Your Interview Responses and Feedback\n\n"
-            
             for i, q in enumerate(st.session_state.questions):
                 if q['question'] in st.session_state.evaluations:
                     data = st.session_state.evaluations[q['question']]
                     evaluation = data["evaluation"]
-                    
                     review += f"### Question {i+1}: {q['question']}\n"
                     review += f"**Your answer:** {data['answer']}\n\n"
                     review += f"**Score:** {evaluation.get('score', 0)}/100\n"
                     review += f"**Feedback:** {evaluation.get('feedback', 'No feedback available')}\n\n"
-                    
                     missing = evaluation.get('missing_concepts', [])
                     if missing:
                         review += "**Areas for improvement:**\n"
                         for concept in missing:
                             review += f"- {concept}\n"
                     review += "\n---\n\n"
-            
             add_message("assistant", review)
-            
+        
         elif "pdf" in user_input.lower() or "export" in user_input.lower():
             try:
                 evaluations = st.session_state.evaluations
@@ -798,7 +796,6 @@ def process_user_input(user_input):
                 
                 pdf_b64 = base64.b64encode(pdf_bytes).decode()
                 pdf_link = f'<a href="data:application/pdf;base64,{pdf_b64}" download="interview_results.pdf">Download Interview Results (PDF)</a>'
-                
                 add_message("assistant", f"Your interview results are ready! {pdf_link}")
             except Exception as e:
                 add_message("assistant", f"Sorry, there was an error generating the PDF: {str(e)}")
@@ -818,13 +815,10 @@ def process_user_input(user_input):
                 st.session_state.evaluations,
                 st.session_state.questions
             )
-            
             add_message("assistant", summary)
-            
             summary_text = summary.encode()
             summary_b64 = base64.b64encode(summary_text).decode()
             summary_link = f'<a href="data:text/markdown;base64,{summary_b64}" download="interview_summary.md">Download Summary (Markdown)</a>'
-            
             add_message("assistant", f"You can also download this summary: {summary_link}")
         
         elif "new" in user_input.lower() or "start" in user_input.lower() or "again" in user_input.lower():
@@ -840,17 +834,14 @@ def process_user_input(user_input):
         else:
             add_message("assistant", """
             What would you like to do next?
-            
             1. **Review your answers and feedback**
             2. **Export your results as PDF**
             3. **Generate a detailed interview summary**
             4. **Start a new interview**
-            
             Just let me know what option you prefer.
             """)
 
-uploaded_file = st.file_uploader("Upload your resume (PDF or DOCX)", type=["pdf", "docx"], key="resume_upload")
-
+# Handle file upload
 if uploaded_file is not None and not st.session_state.resume_text:
     file_extension = uploaded_file.name.split(".")[-1].lower()
     
@@ -865,7 +856,10 @@ if uploaded_file is not None and not st.session_state.resume_text:
     if resume_text:
         st.session_state.resume_text = resume_text
         st.session_state.bot_state = "analyzing_resume"
-        add_message("assistant", "Thanks for uploading your resume! I'm analyzing it to identify your technical skills...")
+        # Reset chat messages to start fresh below uploader
+        st.session_state.chat_messages = [
+            {"role": "assistant", "content": "Thanks for uploading your resume! I'm analyzing it to identify your technical skills..."}
+        ]
         
         skills = extract_skills(resume_text)
         if not skills:
@@ -877,17 +871,22 @@ if uploaded_file is not None and not st.session_state.resume_text:
             skill_message += "\n\nAre these skills accurate? You can add more skills if needed, or type 'start interview' when you're ready."
             add_message("assistant", skill_message)
             st.session_state.bot_state = "confirm_skills"
-        
+
+# Display chat in container
+with chat_container:
+    for message in st.session_state.chat_messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+    
+    # Chat input
+    if user_input := st.chat_input("Type here"):
+        process_user_input(user_input)
         st.rerun()
 
-if user_input := st.chat_input("Type here"):
-    process_user_input(user_input)
-    st.rerun()
-
+# Export options in sidebar when interview is complete
 if st.session_state.interview_complete:
     with st.sidebar:
         st.subheader("Export Results")
-        
         evaluations = st.session_state.evaluations
         total_score = sum(data["evaluation"].get("score", 0) for data in evaluations.values())
         avg_score = total_score / len(evaluations) if evaluations else 0
@@ -902,7 +901,6 @@ if st.session_state.interview_complete:
             st.session_state.evaluations,
             st.session_state.questions
         )
-        
         st.markdown(get_download_link(summary, "interview_summary.md", "Download Summary (Markdown)"), unsafe_allow_html=True)
         
         if st.button("Generate PDF"):
