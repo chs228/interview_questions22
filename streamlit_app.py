@@ -802,7 +802,7 @@ if st.session_state.interview_complete:
             st.session_state.evaluations,
             st.session_state.questions
         )
-        st.markdown(get_download_link(summary, "interview_summary.md", "Download Summary (Markdown)"), unsafe_allow_html=True)
+        st.markdown(get_download_link(summary, "interview_results.pdf", "Download Summary (Markdown)"), unsafe_allow_html=True)
         
         if st.button("Generate PDF"):
             try:
