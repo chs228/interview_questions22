@@ -700,7 +700,7 @@ def process_user_input(user_input):
                 with open(pdf_path, "rb") as f:
                     pdf_bytes = f.read()
                 pdf_b64 = base64.b64encode(pdf_bytes).decode()
-                pdf_link = f'<a href="data:application/pdf;base64,{pdf_b64}" download="interview_results.pdf">Download Interview Results (PDF)</a>'
+                pdf_link = f'<a href="" download="interview_results.pdf">Download Interview Results (PDF)</a>'
                 add_message("assistant", f"Your interview results are ready! {pdf_link}")
             except Exception as e:
                 add_message("assistant", f"Sorry, there was an error generating the PDF: {str(e)}")
