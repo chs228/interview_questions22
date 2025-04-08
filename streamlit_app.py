@@ -8,7 +8,6 @@ import os
 import random
 from datetime import datetime
 
-# For PDF and DOCX processing
 try:
     import PyPDF2
 except ImportError:
@@ -19,14 +18,12 @@ try:
 except ImportError:
     st.error("python-docx is not installed. Please install it with: pip install python-docx")
 
-# For email and PDF generation
 from fpdf import FPDF
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 
-# Simple NLP with NLTK
 try:
     import nltk
     from nltk.tokenize import word_tokenize
@@ -42,7 +39,6 @@ except ImportError as e:
     st.warning(f"NLTK not installed: {e}. NLP features will be disabled.")
     NLP_ENABLED = False
 
-# Define skills dictionary
 COMMON_SKILLS = {
     'programming': ['python', 'java', 'javascript', 'html', 'css', 'c++', 'c#', 'ruby', 'php', 'sql', 'r'],
     'frameworks': ['react', 'angular', 'vue', 'django', 'flask', 'spring', 'node.js', 'express', '.net'],
@@ -52,7 +48,6 @@ COMMON_SKILLS = {
     'soft_skills': ['communication', 'leadership', 'teamwork', 'problem solving', 'time management'],
 }
 
-# Define custom technical questions based on skills
 TECHNICAL_QUESTIONS = {
     'python': [
         {"question": "Explain how you would implement a decorator in Python.", 
@@ -173,7 +168,6 @@ EVALUATION_NEEDS_IMPROVEMENT = [
     "This response could be improved by including more specific technical details."
 ]
 
-# Simple NLP Functions
 def preprocess_text(text):
     if not NLP_ENABLED:
         return text.lower()
@@ -185,29 +179,27 @@ def preprocess_text(text):
     return " ".join(tokens)
 
 def extract_skills_with_nlp(text):
-    """Extract skills with stricter context-based matching."""
+    """Extract skills with very strict context-based matching."""
     if not NLP_ENABLED:
         return extract_skills_basic(text)
     
-    processed_text = preprocess_text(text)
     raw_text = text.lower()
     identified_skills = {}
-    debug_matches = []  # For debugging what was matched
+    debug_matches = []
     
     SKILL_ALIASES = {
-        'python': ['python', 'python3'],
+        'python': ['python'],
         'java': ['java'],
-        'javascript': ['javascript', 'js'],
+        'javascript': ['javascript'],
         'sql': ['sql'],
-        'aws': ['aws', 'amazon web services'],
-        'react': ['react', 'reactjs'],
+        'aws': ['aws'],
+        'react': ['react'],
         'django': ['django'],
         'flask': ['flask'],
         'git': ['git'],
         'github': ['github'],
     }
     
-    # Context keywords that indicate a skill is being listed
     context_patterns = r'(?:skills|experience|proficient in|worked with|knowledge of|using|expertise in|developed with)'
     
     for category, skill_list in COMMON_SKILLS.items():
@@ -215,28 +207,21 @@ def extract_skills_with_nlp(text):
         for skill in skill_list:
             aliases = SKILL_ALIASES.get(skill, [skill])
             for alias in aliases:
-                # Stricter pattern: skill must be near a context keyword
-                pattern = rf'{context_patterns}\s*[\w\s,]*\b{re.escape(alias)}\b[\w\s,]*'
+                # Require exact match near context keyword
+                pattern = rf'{context_patterns}\s*[^.\n]*\b{re.escape(alias)}\b[^.\n]*'
                 matches = re.finditer(pattern, raw_text)
-                if matches:
-                    for match in matches:
-                        found_skills.add(skill)
-                        debug_matches.append(f"Matched '{skill}' in: '{match.group()}'")
-                # Only use processed text as a secondary check if no context match
-                elif preprocess_text(alias) in processed_text:
-                    # Double-check with a stricter boundary in raw text
-                    if re.search(rf'\b{re.escape(alias)}\b', raw_text):
-                        found_skills.add(skill)
-                        debug_matches.append(f"Matched '{skill}' in processed text: '{alias}'")
+                for match in matches:
+                    found_skills.add(skill)
+                    debug_matches.append(f"Matched '{skill}' in: '{match.group()}'")
         if found_skills:
             identified_skills[category] = list(found_skills)
     
-    # Debugging output (optional, can be toggled in UI later)
     st.session_state.debug_skills = debug_matches
+    st.session_state.raw_resume_text = raw_text  # Store raw text for debugging
     return identified_skills
 
 def extract_skills_basic(text):
-    """Basic skill extraction with stricter matching."""
+    """Basic skill extraction with strict context."""
     text = text.lower()
     identified_skills = {}
     context_patterns = r'(?:skills|experience|proficient in|worked with|knowledge of|using|expertise in|developed with)'
@@ -244,7 +229,7 @@ def extract_skills_basic(text):
     for category, skill_list in COMMON_SKILLS.items():
         found_skills = set()
         for skill in skill_list:
-            pattern = rf'{context_patterns}\s*[\w\s,]*\b{re.escape(skill)}\b[\w\s,]*'
+            pattern = rf'{context_patterns}\s*[^.\n]*\b{re.escape(skill)}\b[^.\n]*'
             if re.search(pattern, text):
                 found_skills.add(skill)
         if found_skills:
@@ -268,7 +253,6 @@ def evaluate_answer_with_nlp(question, answer, expected_keywords):
     
     processed_answer = preprocess_text(answer)
     processed_keywords = [preprocess_text(kw) for kw in expected_keywords]
-    
     keyword_count = sum(1 for kw in processed_keywords if kw in processed_answer)
     score = min(keyword_count / len(expected_keywords), 1.0) * 100
     missing = [kw for kw in expected_keywords if preprocess_text(kw) not in processed_answer]
@@ -281,7 +265,6 @@ def evaluate_answer_with_nlp(question, answer, expected_keywords):
 
 def validate_answer_with_gemini(question, answer, expected_keywords):
     api_key = os.environ.get("GEMINI_API_KEY", st.secrets.get("GEMINI_API_KEY", ""))
-    
     if not api_key:
         return evaluate_answer_with_nlp(question, answer, expected_keywords)
     
@@ -300,7 +283,6 @@ def validate_answer_with_gemini(question, answer, expected_keywords):
     3. List of any missing important concepts
     Format as JSON with keys: "score", "feedback", "missing_concepts"
     """
-    
     headers = {"Content-Type": "application/json", "x-goog-api-key": api_key}
     data = {"contents": [{"parts": [{"text": prompt}]}]}
     
@@ -309,27 +291,20 @@ def validate_answer_with_gemini(question, answer, expected_keywords):
         response.raise_for_status()
         response_data = response.json()
         generated_text = response_data["candidates"][0]["content"]["parts"][0]["text"]
-        
         json_str = "".join(line for line in generated_text.split("\n") if line.strip() and "```" not in line)
         if not json_str:
             json_str = generated_text
-        
         json_str = json_str.replace("```json", "").replace("```", "").strip()
-        
-        try:
-            result = json.loads(json_str)
-            return {
-                "score": result.get("score", 50),
-                "feedback": result.get("feedback", "No specific feedback provided."),
-                "missing_concepts": result.get("missing_concepts", [])
-            }
-        except json.JSONDecodeError:
-            return evaluate_answer_with_nlp(question, answer, expected_keywords)
+        result = json.loads(json_str)
+        return {
+            "score": result.get("score", 50),
+            "feedback": result.get("feedback", "No specific feedback provided."),
+            "missing_concepts": result.get("missing_concepts", [])
+        }
     except Exception as e:
         st.error(f"Error calling Gemini API: {str(e)}")
         return evaluate_answer_with_nlp(question, answer, expected_keywords)
 
-# File processing functions
 def extract_text_from_pdf(pdf_file):
     try:
         pdf_reader = PyPDF2.PdfReader(pdf_file)
@@ -354,15 +329,8 @@ def extract_text_from_docx(docx_file):
 
 def generate_technical_questions(skills, max_questions=7):
     all_possible_questions = []
-    
-    all_skills = []
-    for category, skill_list in skills.items():
-        all_skills.extend(skill_list)
-    
-    skill_frequency = {}
-    for skill in all_skills:
-        skill_frequency[skill] = skill_frequency.get(skill, 0) + 1
-    
+    all_skills = [skill for category, skill_list in skills.items() for skill in skill_list]
+    skill_frequency = {skill: all_skills.count(skill) for skill in set(all_skills)}
     sorted_skills = sorted(skill_frequency.keys(), key=lambda x: skill_frequency[x], reverse=True)
     
     for skill in sorted_skills:
@@ -375,7 +343,6 @@ def generate_technical_questions(skills, max_questions=7):
     
     unique_questions = []
     question_texts = set()
-    
     for q in all_possible_questions:
         if q["question"] not in question_texts:
             unique_questions.append(q)
@@ -395,8 +362,7 @@ def generate_technical_questions(skills, max_questions=7):
 
 def get_download_link(text, filename, label="Download"):
     b64 = base64.b64encode(text.encode()).decode()
-    href = f'<a href="data:file/txt;base64,{b64}" download="{filename}">{label}</a>'
-    return href
+    return f'<a href="data:file/txt;base64,{b64}" download="{filename}">{label}</a>'
 
 def get_feedback_message(score):
     if score >= 80:
@@ -415,23 +381,19 @@ def format_skills_message(skills):
 def export_results_as_pdf(candidate_name, interview_date, avg_score, rating, skills, evaluations, questions):
     pdf = FPDF()
     pdf.add_page()
-    
     pdf.set_font("Arial", "B", 16)
     pdf.cell(0, 10, "Technical Interview Results", ln=True, align="C")
     pdf.ln(5)
-    
     pdf.set_font("Arial", "B", 12)
     pdf.cell(0, 10, f"Candidate: {candidate_name}", ln=True)
     pdf.cell(0, 10, f"Date: {interview_date}", ln=True)
     pdf.ln(5)
-    
     pdf.set_font("Arial", "B", 14)
     pdf.cell(0, 10, "Summary", ln=True)
     pdf.set_font("Arial", "", 12)
     pdf.cell(0, 10, f"Overall Score: {avg_score:.1f}/100", ln=True)
     pdf.cell(0, 10, f"Rating: {rating}", ln=True)
     pdf.ln(5)
-    
     pdf.set_font("Arial", "B", 14)
     pdf.cell(0, 10, "Skills", ln=True)
     pdf.set_font("Arial", "", 12)
@@ -441,15 +403,12 @@ def export_results_as_pdf(candidate_name, interview_date, avg_score, rating, ski
         pdf.set_font("Arial", "", 12)
         pdf.multi_cell(0, 10, ", ".join(skill_list))
     pdf.ln(5)
-    
     pdf.set_font("Arial", "B", 14)
     pdf.cell(0, 10, "Interview Questions and Evaluations", ln=True)
-    
     for i, q in enumerate(questions):
         if q['question'] in evaluations:
             data = evaluations[q['question']]
             evaluation = data["evaluation"]
-            
             pdf.set_font("Arial", "B", 12)
             pdf.cell(0, 10, f"Question {i+1}: {q['question']}", ln=True)
             pdf.set_font("Arial", "", 12)
@@ -466,7 +425,6 @@ def export_results_as_pdf(candidate_name, interview_date, avg_score, rating, ski
                 for concept in missing:
                     pdf.cell(0, 10, f"- {concept}", ln=True)
             pdf.ln(5)
-    
     output_path = "interview_results.pdf"
     pdf.output(output_path)
     return output_path
@@ -478,10 +436,8 @@ def generate_interview_summary(candidate_name, interview_date, avg_score, rating
     summary.append(f"**Overall Score:** {avg_score:.1f}/100")
     summary.append(f"**Rating:** {rating}")
     summary.append("\n## Skills Profile")
-    
     for category, skill_list in skills.items():
         summary.append(f"**{category.capitalize()}:** {', '.join(skill_list)}")
-    
     summary.append("\n## Question Analysis")
     for i, q in enumerate(questions):
         if q['question'] in evaluations:
@@ -497,7 +453,6 @@ def generate_interview_summary(candidate_name, interview_date, avg_score, rating
                 for concept in missing:
                     summary.append(f"- {concept}")
             summary.append("")
-    
     summary.append("## Interview Recommendation")
     if avg_score >= 85:
         summary.append("Based on your technical interview performance, you demonstrate strong technical knowledge and communication skills.")
@@ -507,10 +462,8 @@ def generate_interview_summary(candidate_name, interview_date, avg_score, rating
         summary.append("You have a good foundation of technical knowledge, but should continue to build your expertise.")
     else:
         summary.append("Consider spending more time studying the fundamentals of your technical areas.")
-    
     return "\n".join(summary)
 
-# Streamlit App
 st.set_page_config(page_title="Technical Interview Chatbot", layout="wide")
 
 if "resume_text" not in st.session_state:
@@ -537,13 +490,14 @@ if "max_questions" not in st.session_state:
     st.session_state.max_questions = 5
 if "debug_skills" not in st.session_state:
     st.session_state.debug_skills = []
+if "raw_resume_text" not in st.session_state:
+    st.session_state.raw_resume_text = ""
 
 def add_message(role, content):
     st.session_state.chat_messages.append({"role": role, "content": content})
 
 with st.sidebar:
     st.header("Interview Bot Settings")
-    
     if st.session_state.bot_state in ["wait_for_resume", "analyzing_resume"]:
         st.info("Please upload your resume or paste its content to begin.")
     elif st.session_state.bot_state == "interview":
@@ -586,6 +540,7 @@ with st.sidebar:
         st.session_state.chat_messages = [{"role": "assistant", "content": random.choice(WELCOME_MESSAGES) + " " + random.choice(RESUME_PROMPTS)}]
         st.session_state.candidate_name = ""
         st.session_state.debug_skills = []
+        st.session_state.raw_resume_text = ""
         st.rerun()
 
 st.title("Technical Interview Chatbot 🤖")
@@ -615,6 +570,7 @@ def process_user_input(user_input):
             skill_message = random.choice(SKILL_MESSAGES) + "\n\n" + format_skills_message(skills)
             if st.session_state.debug_skills:
                 skill_message += "\n\n**Debug Info:**\n" + "\n".join(st.session_state.debug_skills)
+            skill_message += f"\n\n**Raw Resume Text (first 200 chars):** {st.session_state.raw_resume_text[:200]}..."
             skill_message += "\n\nAre these skills accurate? You can add more skills if needed, or type 'start interview' when you're ready."
             add_message("assistant", skill_message)
             st.session_state.bot_state = "confirm_skills"
@@ -779,6 +735,7 @@ def process_user_input(user_input):
             st.session_state.bot_state = "wait_for_resume"
             st.session_state.chat_messages = [{"role": "assistant", "content": random.choice(WELCOME_MESSAGES) + " " + random.choice(RESUME_PROMPTS)}]
             st.session_state.debug_skills = []
+            st.session_state.raw_resume_text = ""
             st.rerun()
         else:
             add_message("assistant", """
@@ -815,6 +772,7 @@ if uploaded_file is not None and not st.session_state.resume_text:
             skill_message = random.choice(SKILL_MESSAGES) + "\n\n" + format_skills_message(skills)
             if st.session_state.debug_skills:
                 skill_message += "\n\n**Debug Info:**\n" + "\n".join(st.session_state.debug_skills)
+            skill_message += f"\n\n**Raw Resume Text (first 200 chars):** {st.session_state.raw_resume_text[:200]}..."
             skill_message += "\n\nAre these skills accurate? You can add more skills if needed, or type 'start interview' when you're ready."
             add_message("assistant", skill_message)
             st.session_state.bot_state = "confirm_skills"
@@ -863,6 +821,3 @@ if st.session_state.interview_complete:
                 st.markdown(f'<a href="data:application/pdf;base64,{pdf_b64}" download="interview_results.pdf">Download Interview Results (PDF)</a>', unsafe_allow_html=True)
             except Exception as e:
                 st.error(f"Error generating PDF: {str(e)}")
-
-st.markdown("---")
-st.markdown("Technical Interview Chatbot | Powered by Streamlit and Gemini", unsafe_allow_html=True)
