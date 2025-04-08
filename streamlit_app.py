@@ -700,7 +700,7 @@ def process_user_input(user_input):
                 with open(pdf_path, "rb") as f:
                     pdf_bytes = f.read()
                 pdf_b64 = base64.b64encode(pdf_bytes).decode()
-                pdf_link = f'<a href="" download="interview_results.pdf">Download Interview Results (PDF)</a>'
+                pdf_link = f'<a href="data:application/pdf;base64,{pdf_b64}" download="interview_results.pdf">Download Interview Results (PDF)</a>'
                 add_message("assistant", f"Your interview results are ready! {pdf_link}")
             except Exception as e:
                 add_message("assistant", f"Sorry, there was an error generating the PDF: {str(e)}")
@@ -723,7 +723,7 @@ def process_user_input(user_input):
             summary_text = summary.encode()
             summary_b64 = base64.b64encode(summary_text).decode()
             
-            summary_link = f'<a href="" download="interview_results.pdf">Download Summary (Markdown)</a>'
+            summary_link = f'<a href="data:application/pdf;base64,{pdf_b64} download="interview_results.pdf">Download Summary (Markdown)</a>'
             add_message("assistant", f"You can also download this summary: {summary_link}")
         
         elif "new" in user_input.lower() or "start" in user_input.lower() or "again" in user_input.lower():
