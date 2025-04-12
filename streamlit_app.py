@@ -34,14 +34,16 @@ from fpdf import FPDF
 
 # Firebase configuration (loaded from Streamlit secrets)
 firebase_config = {
-    "apiKey": st.secrets.get("firebase_api_key", "your-api-key-here"),
-    "authDomain": st.secrets.get("firebase_auth_domain", "your-project-id.firebaseapp.com"),
-    "projectId": st.secrets.get("firebase_project_id", "your-project-id"),
-    "storageBucket": st.secrets.get("firebase_storage_bucket", "your-project-id.appspot.com"),
-    "messagingSenderId": st.secrets.get("firebase_messaging_sender_id", "your-sender-id"),
-    "appId": st.secrets.get("firebase_app_id", "your-app-id"),
-    "databaseURL": ""  # Not needed for auth
+    "apiKey": "AIzaSyDvFFLr-Fjhma2yae7rx3r7Ei0J6bXJmmI",
+    "authDomain": "client-2bbfc.firebaseapp.com",
+    "databaseURL": "https://client-2bbfc-default-rtdb.firebaseio.com",
+    "projectId": "client-2bbfc",
+    "storageBucket": "client-2bbfc.firebasestorage.app",
+    "messagingSenderId": "971318119261",
+    "appId": "1:971318119261:web:0cf9b5f290f1589326f6b4",
+    "measurementId": "G-5YHQGXBXJG"
 }
+
 
 # Initialize Firebase
 try:
@@ -205,6 +207,9 @@ def sanitize_text(text):
 
 # Email sending
 def send_email(recipient_email, interview_record, pdf_path=None):
+    if not recipient_email:
+        st.error("No email address available. Please log in again.")
+        return False
     try:
         msg = MIMEMultipart()
         msg['From'] = EMAIL_SENDER
@@ -321,7 +326,7 @@ def evaluate_answer(question, answer, expected_keywords):
     except Exception:
         keyword_count = sum(1 for kw in expected_keywords if kw.lower() in answer.lower())
         score = min(keyword_count / len(expected_keywords), 1.0) * 100
-        missing = [k for k in expected_keywords if k.lower() not in answer.lower()]
+        missing = [k for k in expected_keywords if k.lower() in answer.lower()]
         feedback = get_feedback_message(score)
         return {"score": score, "feedback": feedback, "missing_concepts": missing}
 
@@ -454,7 +459,7 @@ def export_results_as_pdf(interview_record):
 
 # Firebase login
 def login():
-    if "user" not in st.session_state:
+    if "user" not in st.session_state or "user_email" not in st.session_state:
         st.session_state.user = None
         st.session_state.user_email = None
     
@@ -469,7 +474,10 @@ def login():
                 try:
                     user = auth.sign_in_with_email_and_password(email, password)
                     st.session_state.user = user
-                    st.session_state.user_email = user['email']
+                    st.session_state.user_email = user.get('email', None)
+                    if not st.session_state.user_email:
+                        st.error("No email found in user data. Please try again.")
+                        return False
                     st.success("Logged in successfully!")
                     st.rerun()
                 except Exception as e:
@@ -482,7 +490,10 @@ def login():
                 try:
                     user = auth.create_user_with_email_and_password(email, password)
                     st.session_state.user = user
-                    st.session_state.user_email = user['email']
+                    st.session_state.user_email = user.get('email', None)
+                    if not st.session_state.user_email:
+                        st.error("No email found in user data. Please try again.")
+                        return False
                     st.success("Account created and logged in!")
                     st.rerun()
                 except Exception as e:
@@ -491,7 +502,7 @@ def login():
         return False
     return True
 
-# Session state
+# Session state initialization
 if "resume_text" not in st.session_state:
     st.session_state.resume_text = ""
 if "skills" not in st.session_state:
@@ -520,6 +531,10 @@ if "raw_resume_text" not in st.session_state:
     st.session_state.raw_resume_text = ""
 if "interview_history" not in st.session_state:
     st.session_state.interview_history = []
+if "user" not in st.session_state:
+    st.session_state.user = None
+if "user_email" not in st.session_state:
+    st.session_state.user_email = None
 
 def add_message(role, content):
     st.session_state.chat_messages.append({"role": role, "content": content})
