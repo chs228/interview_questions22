@@ -54,17 +54,7 @@ TECHNICAL_QUESTIONS = {
         {"question": "How would you handle exceptions in Python?", 
          "expected_keywords": ["try", "except", "finally", "raise", "error", "handling"]},
         {"question": "Describe the difference between a list and a tuple in Python.", 
-         "expected_keywords": ["mutable", "immutable", "list", "tuple", "ordered", "elements"]},
-        {"question": "What are generators in Python and how do they differ from regular functions?", 
-         "expected_keywords": ["generator", "yield", "iterator", "memory", "lazy", "next"]},
-        {"question": "Explain the Global Interpreter Lock (GIL) in Python.", 
-         "expected_keywords": ["GIL", "thread", "multithreading", "lock", "CPython", "performance"]},
-        {"question": "How do you manage memory in Python?", 
-         "expected_keywords": ["garbage collection", "reference counting", "memory", "del", "objects", "heap"]},
-        {"question": "What is the difference between deep copy and shallow copy?", 
-         "expected_keywords": ["deep copy", "shallow copy", "copy", "reference", "nested", "object"]},
-        {"question": "Explain list comprehensions and their advantages.", 
-         "expected_keywords": ["list comprehension", "loop", "concise", "performance", "syntax", "filter"]},
+         "expected_keywords": ["mutable", "immutable", "list", "tuple", "ordered", "elements"]}
     ],
     'java': [
         {"question": "Explain the concept of inheritance in Java.", 
@@ -72,17 +62,7 @@ TECHNICAL_QUESTIONS = {
         {"question": "How do you handle exceptions in Java?", 
          "expected_keywords": ["try", "catch", "finally", "throw", "throws", "exception"]},
         {"question": "What is the difference between an interface and an abstract class in Java?", 
-         "expected_keywords": ["implement", "extend", "methods", "abstract", "interface", "multiple"]},
-        {"question": "Describe how the JVM manages memory.", 
-         "expected_keywords": ["JVM", "heap", "stack", "garbage collection", "memory", "allocation"]},
-        {"question": "What are Java streams and how are they used?", 
-         "expected_keywords": ["stream", "lambda", "functional", "pipeline", "filter", "map"]},
-        {"question": "Explain the concept of multithreading in Java.", 
-         "expected_keywords": ["thread", "runnable", "synchronize", "concurrency", "lock", "executor"]},
-        {"question": "What is the difference between equals() and == in Java?", 
-         "expected_keywords": ["equals", "==", "reference", "value", "comparison", "object"]},
-        {"question": "How does the Java Collections Framework work?", 
-         "expected_keywords": ["collections", "list", "set", "map", "arraylist", "hashmap"]},
+         "expected_keywords": ["implement", "extend", "methods", "abstract", "interface", "multiple"]}
     ],
     'javascript': [
         {"question": "Explain closures in JavaScript.", 
@@ -90,17 +70,7 @@ TECHNICAL_QUESTIONS = {
         {"question": "How does asynchronous programming work in JavaScript?", 
          "expected_keywords": ["promise", "async", "await", "callback", "then", "event loop"]},
         {"question": "What's the difference between var, let, and const in JavaScript?", 
-         "expected_keywords": ["scope", "hoisting", "reassign", "block", "function", "declaration"]},
-        {"question": "What is the event loop in JavaScript?", 
-         "expected_keywords": ["event loop", "call stack", "queue", "asynchronous", "browser", "execution"]},
-        {"question": "Explain the concept of prototypal inheritance.", 
-         "expected_keywords": ["prototype", "inheritance", "object", "chain", "__proto__", "constructor"]},
-        {"question": "What are arrow functions and how do they differ from regular functions?", 
-         "expected_keywords": ["arrow function", "this", "binding", "syntax", "lexical", "concise"]},
-        {"question": "How do you handle errors in JavaScript?", 
-         "expected_keywords": ["try", "catch", "throw", "error", "promise", "async"]},
-        {"question": "What is the difference between null and undefined?", 
-         "expected_keywords": ["null", "undefined", "value", "absence", "type", "comparison"]},
+         "expected_keywords": ["scope", "hoisting", "reassign", "block", "function", "declaration"]}
     ],
     'sql': [
         {"question": "Explain the difference between INNER JOIN and LEFT JOIN.", 
@@ -108,17 +78,7 @@ TECHNICAL_QUESTIONS = {
         {"question": "How would you optimize a slow SQL query?", 
          "expected_keywords": ["index", "execution plan", "query", "optimize", "performance", "analyze"]},
         {"question": "What is database normalization?", 
-         "expected_keywords": ["normal form", "redundancy", "dependency", "relation", "table", "normalize"]},
-        {"question": "What are indexes and how do they impact performance?", 
-         "expected_keywords": ["index", "performance", "lookup", "clustered", "non-clustered", "query"]},
-        {"question": "Explain the ACID properties in databases.", 
-         "expected_keywords": ["ACID", "atomicity", "consistency", "isolation", "durability", "transaction"]},
-        {"question": "What is a stored procedure and when would you use one?", 
-         "expected_keywords": ["stored procedure", "database", "execute", "logic", "performance", "security"]},
-        {"question": "How do you prevent SQL injection attacks?", 
-         "expected_keywords": ["SQL injection", "prepared statement", "parameterized", "sanitize", "escape", "security"]},
-        {"question": "What is the difference between a view and a table?", 
-         "expected_keywords": ["view", "table", "virtual", "query", "stored", "data"]},
+         "expected_keywords": ["normal form", "redundancy", "dependency", "relation", "table", "normalize"]}
     ],
     'react': [
         {"question": "Explain the component lifecycle in React.", 
@@ -126,17 +86,7 @@ TECHNICAL_QUESTIONS = {
         {"question": "How do you manage state in React applications?", 
          "expected_keywords": ["useState", "useReducer", "state", "props", "context", "Redux"]},
         {"question": "What are hooks in React and why were they introduced?", 
-         "expected_keywords": ["hooks", "functional", "state", "effect", "rules", "useState"]},
-        {"question": "What is the virtual DOM and how does it work?", 
-         "expected_keywords": ["virtual DOM", "reconciliation", "diffing", "render", "performance", "update"]},
-        {"question": "How do you optimize performance in a React application?", 
-         "expected_keywords": ["memo", "useCallback", "useMemo", "lazy", "performance", "render"]},
-        {"question": "What is the difference between controlled and uncontrolled components?", 
-         "expected_keywords": ["controlled", "uncontrolled", "state", "form", "input", "manage"]},
-        {"question": "How does React Router work?", 
-         "expected_keywords": ["router", "route", "navigation", "component", "path", "history"]},
-        {"question": "Explain the concept of higher-order components.", 
-         "expected_keywords": ["higher-order", "component", "reuse", "props", "wrapping", "logic"]},
+         "expected_keywords": ["hooks", "functional", "state", "effect", "rules", "useState"]}
     ],
     'aws': [
         {"question": "Explain the difference between EC2 and Lambda.", 
@@ -144,17 +94,7 @@ TECHNICAL_QUESTIONS = {
         {"question": "How do you handle security in AWS?", 
          "expected_keywords": ["IAM", "security group", "encryption", "access", "policy", "role"]},
         {"question": "Describe the AWS services you've worked with.", 
-         "expected_keywords": ["S3", "EC2", "Lambda", "RDS", "CloudFront", "DynamoDB"]},
-        {"question": "What is VPC and why is it used?", 
-         "expected_keywords": ["VPC", "network", "subnet", "isolation", "security", "private"]},
-        {"question": "How does auto-scaling work in AWS?", 
-         "expected_keywords": ["auto-scaling", "EC2", "load balancer", "group", "policy", "traffic"]},
-        {"question": "Explain the difference between S3 and EBS.", 
-         "expected_keywords": ["S3", "EBS", "storage", "block", "object", "durability"]},
-        {"question": "What is CloudFormation and how is it used?", 
-         "expected_keywords": ["CloudFormation", "template", "infrastructure", "stack", "provision", "YAML"]},
-        {"question": "How do you monitor AWS resources?", 
-         "expected_keywords": ["CloudWatch", "metrics", "logs", "alarms", "monitoring", "dashboard"]},
+         "expected_keywords": ["S3", "EC2", "Lambda", "RDS", "CloudFront", "DynamoDB"]}
     ],
 }
 
@@ -166,11 +106,7 @@ GENERIC_QUESTIONS = [
     {"question": "Describe your experience with agile development methodologies.", 
      "expected_keywords": ["agile", "scrum", "sprint", "kanban", "standup", "retrospective"]},
     {"question": "How do you ensure code quality in your projects?", 
-     "expected_keywords": ["testing", "review", "standards", "documentation", "refactoring", "clean"]},
-    {"question": "What strategies do you use to debug complex issues?", 
-     "expected_keywords": ["debug", "breakpoint", "log", "trace", "isolate", "tools"]},
-    {"question": "How do you handle conflicting priorities in a project?", 
-     "expected_keywords": ["prioritize", "communication", "stakeholder", "deadline", "trade-off", "plan"]},
+     "expected_keywords": ["testing", "review", "standards", "documentation", "refactoring", "clean"]}
 ]
 
 WELCOME_MESSAGES = [
@@ -270,6 +206,7 @@ def extract_skills_with_nlp(text):
         for skill in skill_list:
             aliases = SKILL_ALIASES.get(skill, [skill])
             for alias in aliases:
+                # Require exact match near context keyword
                 pattern = rf'{context_patterns}\s*[^.\n]*\b{re.escape(alias)}\b[^.\n]*'
                 matches = re.finditer(pattern, raw_text)
                 for match in matches:
@@ -279,7 +216,7 @@ def extract_skills_with_nlp(text):
             identified_skills[category] = list(found_skills)
     
     st.session_state.debug_skills = debug_matches
-    st.session_state.raw_resume_text = raw_text
+    st.session_state.raw_resume_text = raw_text  # Store raw text for debugging
     return identified_skills
 
 def extract_skills_basic(text):
@@ -308,31 +245,42 @@ def evaluate_answer_with_nlp(question, answer, expected_keywords):
     if not answer.strip():
         return {"score": 0, "feedback": "No answer provided.", "missing_concepts": expected_keywords}
     
+    # Basic keyword matching if NLP is not enabled
     if not NLP_ENABLED:
         keyword_count = sum(1 for keyword in expected_keywords if keyword.lower() in answer.lower())
         score = min(keyword_count / len(expected_keywords), 1.0) * 100
         missing = [k for k in expected_keywords if k.lower() not in answer.lower()]
         return {"score": score, "feedback": "Basic keyword matching applied.", "missing_concepts": missing}
     
+    # Advanced NLP processing
     processed_answer = preprocess_text(answer)
     processed_keywords = [preprocess_text(kw) for kw in expected_keywords]
     
+    # Count matched keywords
     keyword_count = sum(1 for kw in processed_keywords if kw in processed_answer)
+    
+    # Calculate score based on keyword coverage
     score = min(keyword_count / len(expected_keywords), 1.0) * 100
+    
+    # Identify missing concepts
     missing = [kw for kw in expected_keywords if preprocess_text(kw) not in processed_answer]
     
+    # Generate feedback based on score
     feedback = get_feedback_message(score)
     if missing:
         feedback += f" Consider mentioning: {', '.join(missing[:3])}."
     
+    # For technical depth analysis, check sentence length and variation
     sentences = answer.split('.')
     avg_sentence_length = sum(len(s.split()) for s in sentences if s.strip()) / max(1, len([s for s in sentences if s.strip()]))
     
+    # Analyze technical depth based on answer length and keyword density
     if len(answer.split()) > 100 and score > 70:
         feedback += " Your answer shows good technical depth."
     elif len(answer.split()) < 30 and score < 70:
         feedback += " Consider providing a more detailed explanation."
     
+    # Check for explanation patterns
     explanation_patterns = ["because", "therefore", "means that", "this is why", "which is"]
     has_explanations = any(pattern in answer.lower() for pattern in explanation_patterns)
     
@@ -372,14 +320,16 @@ def extract_text_from_docx(docx_file):
 def generate_technical_questions(skills, max_questions=7):
     all_possible_questions = []
     all_skills = [skill for category, skill_list in skills.items() for skill in skill_list]
+    skill_frequency = {skill: all_skills.count(skill) for skill in set(all_skills)}
+    sorted_skills = sorted(skill_frequency.keys(), key=lambda x: skill_frequency[x], reverse=True)
     
-    for skill in set(all_skills):
+    for skill in sorted_skills:
         if skill in TECHNICAL_QUESTIONS:
-            skill_questions = TECHNICAL_QUESTIONS[skill].copy()
-            random.shuffle(skill_questions)
-            all_possible_questions.extend(skill_questions)
+            all_possible_questions.extend(TECHNICAL_QUESTIONS[skill])
     
-    random.shuffle(all_possible_questions)
+    if len(all_possible_questions) < max_questions:
+        random.shuffle(GENERIC_QUESTIONS)
+        all_possible_questions.extend(GENERIC_QUESTIONS)
     
     unique_questions = []
     question_texts = set()
@@ -391,9 +341,7 @@ def generate_technical_questions(skills, max_questions=7):
                 break
     
     if len(unique_questions) < max_questions:
-        generic = GENERIC_QUESTIONS.copy()
-        random.shuffle(generic)
-        for q in generic:
+        for q in GENERIC_QUESTIONS:
             if q["question"] not in question_texts:
                 unique_questions.append(q)
                 question_texts.add(q["question"])
@@ -655,83 +603,4 @@ def process_user_input(user_input):
             else:
                 add_message("assistant", "I'm ready whenever you are. Type 'start interview' to begin.")
     
-    elif st.session_state.bot_state == "interview":
-        current_index = st.session_state.current_question_index
-        if current_index < len(st.session_state.questions):
-            current_question = st.session_state.questions[current_index]
-            evaluation = evaluate_answer_with_nlp(
-                current_question["question"],
-                user_input,
-                current_question["expected_keywords"]
-            )
-            st.session_state.evaluations[current_question["question"]] = {
-                "answer": user_input,
-                "evaluation": evaluation
-            }
-            st.session_state.current_question_index += 1
-            
-            if st.session_state.current_question_index < len(st.session_state.questions):
-                next_question = st.session_state.questions[st.session_state.current_question_index]
-                add_message("assistant", f"{evaluation['feedback']}\n\n{random.choice(QUESTION_TRANSITIONS)}\n\n**Question {st.session_state.current_question_index + 1}:** {next_question['question']}")
-            else:
-                st.session_state.bot_state = "complete"
-                evaluations = st.session_state.evaluations
-                total_score = sum(data["evaluation"].get("score", 0) for data in evaluations.values())
-                avg_score = total_score / len(evaluations) if evaluations else 0
-                rating = "Excellent" if avg_score >= 85 else "Good" if avg_score >= 70 else "Average" if avg_score >= 50 else "Needs Improvement"
-                
-                summary = generate_interview_summary(
-                    st.session_state.candidate_name or "Candidate",
-                    st.session_state.interview_date,
-                    avg_score,
-                    rating,
-                    st.session_state.skills,
-                    st.session_state.evaluations,
-                    st.session_state.questions
-                )
-                
-                add_message("assistant", f"Interview complete! Your overall score is {avg_score:.1f}/100 ({rating}).\n\nHere's your detailed summary:\n\n{summary}")
-                
-                pdf_path = export_results_as_pdf(
-                    st.session_state.candidate_name or "Candidate",
-                    st.session_state.interview_date,
-                    avg_score,
-                    rating,
-                    st.session_state.skills,
-                    st.session_state.evaluations,
-                    st.session_state.questions
-                )
-                
-                with open(pdf_path, "rb") as f:
-                    st.session_state.pdf_data = f.read()
-                
-                add_message("assistant", "You can download your interview results as a PDF below.")
-
-with chat_container:
-    for message in st.session_state.chat_messages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
-    
-    if st.session_state.bot_state == "complete" and "pdf_data" in st.session_state:
-        st.download_button(
-            label="Download Interview Results (PDF)",
-            data=st.session_state.pdf_data,
-            file_name="interview_results.pdf",
-            mime="application/pdf"
-        )
-
-if uploaded_file is not None:
-    if uploaded_file.type == "application/pdf":
-        st.session_state.resume_text = extract_text_from_pdf(uploaded_file)
-    elif uploaded_file.type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-        st.session_state.resume_text = extract_text_from_docx(uploaded_file)
-    st.session_state.bot_state = "analyzing_resume"
-    add_message("assistant", "Thanks for uploading your resume! I'm analyzing it to identify your technical skills...")
-    process_user_input(st.session_state.resume_text)
-    st.rerun()
-
-if st.session_state.bot_state != "complete":
-    user_input = st.chat_input("Your response...")
-    if user_input:
-        process_user_input(user_input)
-        st.rerun()
+    elif st.session_state
