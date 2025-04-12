@@ -373,18 +373,14 @@ def generate_technical_questions(skills, max_questions=7):
     all_possible_questions = []
     all_skills = [skill for category, skill_list in skills.items() for skill in skill_list]
     
-    # Collect all relevant technical questions for the candidate's skills
     for skill in set(all_skills):
         if skill in TECHNICAL_QUESTIONS:
-            # Shuffle the questions for this skill to ensure randomness
             skill_questions = TECHNICAL_QUESTIONS[skill].copy()
             random.shuffle(skill_questions)
             all_possible_questions.extend(skill_questions)
     
-    # Shuffle all collected questions to mix skills
     random.shuffle(all_possible_questions)
     
-    # Select up to max_questions, ensuring unique questions
     unique_questions = []
     question_texts = set()
     for q in all_possible_questions:
@@ -394,7 +390,6 @@ def generate_technical_questions(skills, max_questions=7):
             if len(unique_questions) >= max_questions:
                 break
     
-    # If we don't have enough questions, add generic ones
     if len(unique_questions) < max_questions:
         generic = GENERIC_QUESTIONS.copy()
         random.shuffle(generic)
@@ -405,7 +400,6 @@ def generate_technical_questions(skills, max_questions=7):
                 if len(unique_questions) >= max_questions:
                     break
     
-    # Ensure we return exactly max_questions (or fewer if we run out)
     return unique_questions[:max_questions]
 
 def get_download_link(text, filename, label="Download"):
@@ -485,7 +479,7 @@ def generate_interview_summary(candidate_name, interview_date, avg_score, rating
     summary.append(f"**Rating:** {rating}")
     summary.append("\n## Skills Profile")
     for category, skill_list in skills.items():
-        summary.append(f"**{category.capitalize():** {', '.join(skill_list)}")
+        summary.append(f"**{category.capitalize()}:** {', '.join(skill_list)}")
     summary.append("\n## Question Analysis")
     for i, q in enumerate(questions):
         if q['question'] in evaluations:
@@ -546,7 +540,7 @@ def add_message(role, content):
 
 with st.sidebar:
     st.header("Interview Bot Settings")
-    if st.session_state.bot_state in ["wait_for_resume", " Analyzing_resume"]:
+    if st.session_state.bot_state in ["wait_for_resume", "analyzing_resume"]:
         st.info("Please upload your resume or paste its content to begin.")
     elif st.session_state.bot_state == "interview":
         st.subheader("Interview Progress")
