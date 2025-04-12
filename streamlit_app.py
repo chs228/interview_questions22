@@ -34,13 +34,14 @@ from fpdf import FPDF
 
 # Firebase configuration (store in Streamlit secrets)
 firebase_config = {
-    "apiKey": st.secrets.get("firebase_api_key", ""),
-    "authDomain": st.secrets.get("firebase_auth_domain", ""),
-    "projectId": st.secrets.get("firebase_project_id", ""),
-    "storageBucket": st.secrets.get("firebase_storage_bucket", ""),
-    "messagingSenderId": st.secrets.get("firebase_messaging_sender_id", ""),
-    "appId": st.secrets.get("firebase_app_id", ""),
-    "databaseURL": ""  # Not needed for auth
+      apiKey: "AIzaSyDvFFLr-Fjhma2yae7rx3r7Ei0J6bXJmmI",
+      authDomain: "client-2bbfc.firebaseapp.com",
+      databaseURL: "https://client-2bbfc-default-rtdb.firebaseio.com",
+      projectId: "client-2bbfc",
+      storageBucket: "client-2bbfc.firebasestorage.app",
+      messagingSenderId: "971318119261",
+      appId: "1:971318119261:web:0cf9b5f290f1589326f6b4",
+      measurementId: "G-5YHQGXBXJG"
 }
 
 # Initialize Firebase
