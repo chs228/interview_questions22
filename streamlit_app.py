@@ -9,7 +9,10 @@ import base64
 import os
 import random
 from datetime import datetime
-import requests  # For generative AI API calls
+import requests
+
+# Set NLTK data path (for Streamlit Cloud or custom setups)
+os.environ['NLTK_DATA'] = os.path.join(os.getcwd(), 'nltk_data')
 
 # Check for optional dependencies
 try:
@@ -30,20 +33,17 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 
-# NLTK import with robust data downloading
+# NLTK import with robust error handling
 try:
     import nltk
     from nltk.tokenize import word_tokenize
     from nltk.corpus import stopwords
     from nltk.stem import WordNetLemmatizer
     
-    # Attempt to download NLTK data
     try:
-        nltk.download('punkt', quiet=True)
-        nltk.download('stopwords', quiet=True)
-        nltk.download('wordnet', quiet=True)
-        # Verify punkt data is available
         nltk.data.find('tokenizers/punkt_tab')
+        nltk.data.find('corpora/stopwords')
+        nltk.data.find('corpora/wordnet')
         NLP_ENABLED = True
     except LookupError:
         st.warning("NLTK data (punkt, stopwords, or wordnet) could not be found. NLP features will be disabled.")
@@ -54,8 +54,8 @@ except ImportError:
     st.warning("NLTK is not installed. NLP features will be disabled. Install with: pip install nltk")
 
 # Placeholder for generative AI API configuration
-GENAI_API_KEY = os.getenv("XAI_API_KEY")  # Replace with your API key environment variable
-GENAI_API_URL = "https://api.xai.com/v1/evaluate"  # Placeholder; replace with actual endpoint
+GENAI_API_KEY = os.getenv("XAI_API_KEY")  # Set this in your environment
+GENAI_API_URL = "https://api.xai.com/v1/evaluate"  # Placeholder
 GENAI_ENABLED = bool(GENAI_API_KEY)
 
 COMMON_SKILLS = {
@@ -242,7 +242,6 @@ def extract_skills_with_nlp(text):
         for skill in skill_list:
             aliases = SKILL_ALIASES.get(skill, [skill])
             for alias in aliases:
-                # Require exact match near context keyword
                 pattern = rf'{context_patterns}\s*[^.\n]*\b{re.escape(alias)}\b[^.\n]*'
                 matches = re.finditer(pattern, raw_text)
                 for match in matches:
@@ -307,7 +306,6 @@ def evaluate_answer_with_genai(question, answer, expected_keywords):
         return evaluate_answer_with_nlp(question, answer, expected_keywords)
     
     try:
-        # Prepare the prompt for the generative AI
         prompt = f"""
         Evaluate the following answer to a technical interview question for accuracy, depth, and relevance.
         Question: {question}
@@ -334,7 +332,6 @@ def evaluate_answer_with_genai(question, answer, expected_keywords):
         response.raise_for_status()
         result = response.json()
         
-        # Parse the AI's response (assuming structured output)
         score = result.get("score", 50)
         feedback = result.get("feedback", "Evaluation provided by AI.")
         missing_concepts = result.get("missing_concepts", [])
@@ -380,7 +377,7 @@ def generate_technical_questions(skills, max_questions=7):
     
     # Randomly select skills to ensure variety
     if all_skills:
-        selected_skills = random.sample(all_skills, min(len(all_skills), 3))  # Pick up to 3 skills
+        selected_skills = random.sample(all_skills, min(len(all_skills), 3))
     else:
         selected_skills = []
     
@@ -388,12 +385,11 @@ def generate_technical_questions(skills, max_questions=7):
     for skill in selected_skills:
         if skill in TECHNICAL_QUESTIONS:
             skill_questions = TECHNICAL_QUESTIONS[skill]
-            all_possible_questions.extend(random.sample(skill_questions, min(len(skill_questions), 2)))  # Pick up to 2 per skill
+            all_possible_questions.extend(random.sample(skill_questions, min(len(skill_questions), 2)))
     
     # Fill remaining slots with generic questions or other skill questions
     remaining_slots = max_questions - len(all_possible_questions)
     if remaining_slots > 0:
-        # Add generic questions
         generic_available = random.sample(GENERIC_QUESTIONS, min(len(GENERIC_QUESTIONS), remaining_slots))
         all_possible_questions.extend(generic_available)
         remaining_slots -= len(generic_available)
@@ -521,7 +517,7 @@ if "debug_skills" not in st.session_state:
 if "raw_resume_text" not in st.session_state:
     st.session_state.raw_resume_text = ""
 if "interview_history" not in st.session_state:
-    st.session_state.interview_history = []  # List to store past interviews
+    st.session_state.interview_history = []
 
 def add_message(role, content):
     st.session_state.chat_messages.append({"role": role, "content": content})
