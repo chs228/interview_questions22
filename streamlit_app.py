@@ -1,15 +1,15 @@
 import streamlit as st
 
-# Set page config as the very first command
+# Set page config as the first command
 st.set_page_config(page_title="Technical Interview Chatbot", layout="wide")
 
 import re
 import io
 import base64
-import json
 import os
 import random
 from datetime import datetime
+import requests  # For generative AI API calls
 
 # Check for optional dependencies
 try:
@@ -46,12 +46,17 @@ try:
         nltk.data.find('tokenizers/punkt_tab')
         NLP_ENABLED = True
     except LookupError:
-        st.warning("NLTK data (punkt, stopwords, or wordnet) could not be downloaded or found. NLP features will be disabled.")
+        st.warning("NLTK data (punkt, stopwords, or wordnet) could not be found. NLP features will be disabled.")
         NLP_ENABLED = False
 except ImportError:
     nltk = None
     NLP_ENABLED = False
     st.warning("NLTK is not installed. NLP features will be disabled. Install with: pip install nltk")
+
+# Placeholder for generative AI API configuration
+GENAI_API_KEY = os.getenv("XAI_API_KEY")  # Replace with your API key environment variable
+GENAI_API_URL = "https://api.xai.com/v1/evaluate"  # Placeholder; replace with actual endpoint
+GENAI_ENABLED = bool(GENAI_API_KEY)
 
 COMMON_SKILLS = {
     'programming': ['python', 'java', 'javascript', 'html', 'css', 'c++', 'c#', 'ruby', 'php', 'sql', 'r'],
@@ -68,60 +73,72 @@ TECHNICAL_QUESTIONS = {
          "expected_keywords": ["function", "wrapper", "decorator", "@", "arguments", "return"]},
         {"question": "How would you handle exceptions in Python?", 
          "expected_keywords": ["try", "except", "finally", "raise", "error", "handling"]},
-        {"question": "Describe the difference between a list and a tuple in Python.", 
-         "expected_keywords": ["mutable", "immutable", "list", "tuple", "ordered", "elements"]}
+        {"question": "Describe list comprehensions and their advantages in Python.", 
+         "expected_keywords": ["list", "comprehension", "concise", "loop", "condition", "performance"]},
+        {"question": "What is a generator in Python and how is it used?", 
+         "expected_keywords": ["generator", "yield", "iterator", "memory", "lazy", "evaluation"]},
     ],
     'java': [
         {"question": "Explain the concept of inheritance in Java.", 
          "expected_keywords": ["extends", "class", "parent", "child", "super", "override"]},
-        {"question": "How do you handle exceptions in Java?", 
-         "expected_keywords": ["try", "catch", "finally", "throw", "throws", "exception"]},
-        {"question": "What is the difference between an interface and an abstract class in Java?", 
-         "expected_keywords": ["implement", "extend", "methods", "abstract", "interface", "multiple"]}
+        {"question": "How do you manage memory in Java?", 
+         "expected_keywords": ["garbage collection", "heap", "stack", "reference", "finalize", "memory"]},
+        {"question": "What are Java streams and how are they used?", 
+         "expected_keywords": ["stream", "functional", "map", "filter", "collect", "pipeline"]},
+        {"question": "Describe synchronization in Java multithreading.", 
+         "expected_keywords": ["synchronized", "thread", "lock", "monitor", "concurrency", "block"]},
     ],
     'javascript': [
         {"question": "Explain closures in JavaScript.", 
          "expected_keywords": ["function", "scope", "variable", "closure", "lexical", "access"]},
-        {"question": "How does asynchronous programming work in JavaScript?", 
-         "expected_keywords": ["promise", "async", "await", "callback", "then", "event loop"]},
-        {"question": "What's the difference between var, let, and const in JavaScript?", 
-         "expected_keywords": ["scope", "hoisting", "reassign", "block", "function", "declaration"]}
+        {"question": "How does event delegation work in JavaScript?", 
+         "expected_keywords": ["event", "delegation", "bubble", "target", "listener", "parent"]},
+        {"question": "What are promises and async/await in JavaScript?", 
+         "expected_keywords": ["promise", "async", "await", "resolve", "reject", "asynchronous"]},
+        {"question": "Describe the JavaScript event loop.", 
+         "expected_keywords": ["event loop", "call stack", "queue", "async", "callback", "render"]},
     ],
     'sql': [
         {"question": "Explain the difference between INNER JOIN and LEFT JOIN.", 
          "expected_keywords": ["inner", "left", "join", "matching", "all", "records"]},
         {"question": "How would you optimize a slow SQL query?", 
          "expected_keywords": ["index", "execution plan", "query", "optimize", "performance", "analyze"]},
-        {"question": "What is database normalization?", 
-         "expected_keywords": ["normal form", "redundancy", "dependency", "relation", "table", "normalize"]}
+        {"question": "What are triggers in SQL?", 
+         "expected_keywords": ["trigger", "event", "table", "insert", "update", "delete"]},
+        {"question": "Explain ACID properties in databases.", 
+         "expected_keywords": ["atomicity", "consistency", "isolation", "durability", "transaction", "acid"]},
     ],
     'react': [
         {"question": "Explain the component lifecycle in React.", 
          "expected_keywords": ["mount", "update", "unmount", "render", "effect", "component"]},
-        {"question": "How do you manage state in React applications?", 
-         "expected_keywords": ["useState", "useReducer", "state", "props", "context", "Redux"]},
-        {"question": "What are hooks in React and why were they introduced?", 
-         "expected_keywords": ["hooks", "functional", "state", "effect", "rules", "useState"]}
+        {"question": "How do you optimize performance in React?", 
+         "expected_keywords": ["memo", "useCallback", "useMemo", "render", "optimization", "state"]},
+        {"question": "What is the Context API in React?", 
+         "expected_keywords": ["context", "provider", "consumer", "state", "props", "global"]},
+        {"question": "Describe React hooks and their benefits.", 
+         "expected_keywords": ["hooks", "functional", "state", "effect", "rules", "useState"]},
     ],
     'aws': [
         {"question": "Explain the difference between EC2 and Lambda.", 
          "expected_keywords": ["instance", "serverless", "EC2", "Lambda", "scaling", "compute"]},
-        {"question": "How do you handle security in AWS?", 
+        {"question": "How do you secure an AWS environment?", 
          "expected_keywords": ["IAM", "security group", "encryption", "access", "policy", "role"]},
-        {"question": "Describe the AWS services you've worked with.", 
-         "expected_keywords": ["S3", "EC2", "Lambda", "RDS", "CloudFront", "DynamoDB"]}
+        {"question": "What is S3 and how is it used?", 
+         "expected_keywords": ["S3", "storage", "bucket", "object", "access", "policy"]},
+        {"question": "Describe VPC and its components.", 
+         "expected_keywords": ["VPC", "subnet", "route table", "gateway", "security group", "network"]},
     ],
 }
 
 GENERIC_QUESTIONS = [
-    {"question": "Tell me about a challenging project you worked on and how you overcame obstacles.", 
+    {"question": "Describe a technical challenge you faced and how you resolved it.", 
      "expected_keywords": ["challenge", "project", "solution", "overcome", "team", "result"]},
-    {"question": "How do you approach learning new technologies?", 
-     "expected_keywords": ["learning", "research", "practice", "curiosity", "documentation", "projects"]},
-    {"question": "Describe your experience with agile development methodologies.", 
-     "expected_keywords": ["agile", "scrum", "sprint", "kanban", "standup", "retrospective"]},
-    {"question": "How do you ensure code quality in your projects?", 
-     "expected_keywords": ["testing", "review", "standards", "documentation", "refactoring", "clean"]}
+    {"question": "How do you stay updated with new technologies?", 
+     "expected_keywords": ["learning", "research", "practice", "community", "documentation", "courses"]},
+    {"question": "Explain your approach to debugging complex issues.", 
+     "expected_keywords": ["debugging", "logs", "breakpoint", "systematic", "testing", "root cause"]},
+    {"question": "How do you prioritize tasks in a project?", 
+     "expected_keywords": ["prioritize", "deadline", "impact", "stakeholder", "planning", "agile"]},
 ]
 
 WELCOME_MESSAGES = [
@@ -197,7 +214,7 @@ def preprocess_text(text):
         return text.lower()
 
 def extract_skills_with_nlp(text):
-    """Extract skills with very strict context-based matching using NLTK."""
+    """Extract skills with strict context-based matching using NLTK."""
     if not NLP_ENABLED:
         return extract_skills_basic(text)
     
@@ -235,7 +252,7 @@ def extract_skills_with_nlp(text):
             identified_skills[category] = list(found_skills)
     
     st.session_state.debug_skills = debug_matches
-    st.session_state.raw_resume_text = raw_text  # Store raw text for debugging
+    st.session_state.raw_resume_text = raw_text
     return identified_skills
 
 def extract_skills_basic(text):
@@ -281,6 +298,56 @@ def evaluate_answer_with_nlp(question, answer, expected_keywords):
     
     return {"score": score, "feedback": feedback, "missing_concepts": missing}
 
+def evaluate_answer_with_genai(question, answer, expected_keywords):
+    if not answer.strip():
+        return {"score": 0, "feedback": "No answer provided.", "missing_concepts": expected_keywords}
+    
+    if not GENAI_ENABLED:
+        st.warning("Generative AI evaluation is disabled. Falling back to NLP evaluation.")
+        return evaluate_answer_with_nlp(question, answer, expected_keywords)
+    
+    try:
+        # Prepare the prompt for the generative AI
+        prompt = f"""
+        Evaluate the following answer to a technical interview question for accuracy, depth, and relevance.
+        Question: {question}
+        Answer: {answer}
+        Expected key concepts: {', '.join(expected_keywords)}
+        
+        Provide:
+        - A score from 0 to 100 based on how well the answer addresses the question and includes the key concepts.
+        - A brief feedback paragraph explaining the score.
+        - A list of missing concepts (if any).
+        """
+        
+        headers = {
+            "Authorization": f"Bearer {GENAI_API_KEY}",
+            "Content-Type": "application/json"
+        }
+        payload = {
+            "prompt": prompt,
+            "max_tokens": 500,
+            "temperature": 0.7
+        }
+        
+        response = requests.post(GENAI_API_URL, json=payload, headers=headers)
+        response.raise_for_status()
+        result = response.json()
+        
+        # Parse the AI's response (assuming structured output)
+        score = result.get("score", 50)
+        feedback = result.get("feedback", "Evaluation provided by AI.")
+        missing_concepts = result.get("missing_concepts", [])
+        
+        return {
+            "score": min(max(score, 0), 100),
+            "feedback": feedback,
+            "missing_concepts": missing_concepts
+        }
+    except Exception as e:
+        st.error(f"Error with generative AI evaluation: {str(e)}. Falling back to NLP evaluation.")
+        return evaluate_answer_with_nlp(question, answer, expected_keywords)
+
 def extract_text_from_pdf(pdf_file):
     if PyPDF2 is None:
         return ""
@@ -310,39 +377,48 @@ def extract_text_from_docx(docx_file):
 def generate_technical_questions(skills, max_questions=7):
     all_possible_questions = []
     all_skills = [skill for category, skill_list in skills.items() for skill in skill_list]
-    skill_frequency = {skill: all_skills.count(skill) for skill in set(all_skills)}
-    sorted_skills = sorted(skill_frequency.keys(), key=lambda x: skill_frequency[x], reverse=True)
     
-    for skill in sorted_skills:
+    # Randomly select skills to ensure variety
+    if all_skills:
+        selected_skills = random.sample(all_skills, min(len(all_skills), 3))  # Pick up to 3 skills
+    else:
+        selected_skills = []
+    
+    # Collect questions for selected skills
+    for skill in selected_skills:
         if skill in TECHNICAL_QUESTIONS:
-            all_possible_questions.extend(TECHNICAL_QUESTIONS[skill])
+            skill_questions = TECHNICAL_QUESTIONS[skill]
+            all_possible_questions.extend(random.sample(skill_questions, min(len(skill_questions), 2)))  # Pick up to 2 per skill
     
-    if len(all_possible_questions) < max_questions:
-        random.shuffle(GENERIC_QUESTIONS)
-        all_possible_questions.extend(GENERIC_QUESTIONS)
+    # Fill remaining slots with generic questions or other skill questions
+    remaining_slots = max_questions - len(all_possible_questions)
+    if remaining_slots > 0:
+        # Add generic questions
+        generic_available = random.sample(GENERIC_QUESTIONS, min(len(GENERIC_QUESTIONS), remaining_slots))
+        all_possible_questions.extend(generic_available)
+        remaining_slots -= len(generic_available)
     
+    # If still needed, add more random technical questions
+    if remaining_slots > 0:
+        all_tech_questions = []
+        for skill in TECHNICAL_QUESTIONS:
+            if skill not in selected_skills:
+                all_tech_questions.extend(TECHNICAL_QUESTIONS[skill])
+        if all_tech_questions:
+            all_possible_questions.extend(random.sample(all_tech_questions, min(len(all_tech_questions), remaining_slots)))
+    
+    # Shuffle the final list for randomness
+    random.shuffle(all_possible_questions)
+    
+    # Ensure uniqueness
     unique_questions = []
     question_texts = set()
     for q in all_possible_questions:
         if q["question"] not in question_texts:
             unique_questions.append(q)
             question_texts.add(q["question"])
-            if len(unique_questions) >= max_questions:
-                break
-    
-    if len(unique_questions) < max_questions:
-        for q in GENERIC_QUESTIONS:
-            if q["question"] not in question_texts:
-                unique_questions.append(q)
-                question_texts.add(q["question"])
-                if len(unique_questions) >= max_questions:
-                    break
     
     return unique_questions[:max_questions]
-
-def get_download_link(text, filename, label="Download"):
-    b64 = base64.b64encode(text.encode()).decode()
-    return f'<a href="data:file/txt;base64,{b64}" download="{filename}">{label}</a>'
 
 def get_feedback_message(score):
     if score >= 80:
@@ -358,7 +434,15 @@ def format_skills_message(skills):
         message += f"**{category.capitalize()}**: {', '.join(skill_list)}\n"
     return message
 
-def export_results_as_pdf(candidate_name, interview_date, avg_score, rating, skills, evaluations, questions):
+def export_results_as_pdf(interview_record):
+    candidate_name = interview_record.get("candidate_name", "Candidate")
+    interview_date = interview_record.get("date", datetime.now().strftime("%Y-%m-%d %H:%M"))
+    avg_score = interview_record.get("avg_score", 0)
+    rating = interview_record.get("rating", "N/A")
+    skills = interview_record.get("skills", {})
+    evaluations = interview_record.get("evaluations", {})
+    questions = interview_record.get("questions", [])
+    
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", "B", 16)
@@ -405,44 +489,9 @@ def export_results_as_pdf(candidate_name, interview_date, avg_score, rating, ski
                 for concept in missing:
                     pdf.cell(0, 10, f"- {concept}", ln=True)
             pdf.ln(5)
-    output_path = "interview_results.pdf"
+    output_path = f"interview_results_{candidate_name}_{interview_date.replace(':', '-')}.pdf"
     pdf.output(output_path)
     return output_path
-
-def generate_interview_summary(candidate_name, interview_date, avg_score, rating, skills, evaluations, questions):
-    summary = []
-    summary.append(f"# Technical Interview Results for {candidate_name}")
-    summary.append(f"**Date:** {interview_date}")
-    summary.append(f"**Overall Score:** {avg_score:.1f}/100")
-    summary.append(f"**Rating:** {rating}")
-    summary.append("\n## Skills Profile")
-    for category, skill_list in skills.items():
-        summary.append(f"**{category.capitalize()}:** {', '.join(skill_list)}")
-    summary.append("\n## Question Analysis")
-    for i, q in enumerate(questions):
-        if q['question'] in evaluations:
-            data = evaluations[q['question']]
-            evaluation = data["evaluation"]
-            score = evaluation.get('score', 0)
-            summary.append(f"### Question {i+1}: {q['question']}")
-            summary.append(f"**Score:** {score}/100")
-            summary.append(f"**Feedback:** {evaluation.get('feedback', 'No feedback available')}")
-            missing = evaluation.get('missing_concepts', [])
-            if missing:
-                summary.append("**Areas for improvement:**")
-                for concept in missing:
-                    summary.append(f"- {concept}")
-            summary.append("")
-    summary.append("## Interview Recommendation")
-    if avg_score >= 85:
-        summary.append("Based on your technical interview performance, you demonstrate strong technical knowledge and communication skills.")
-    elif avg_score >= 70:
-        summary.append("Your technical skills are solid, with some areas that could benefit from deeper understanding.")
-    elif avg_score >= 50:
-        summary.append("You have a good foundation of technical knowledge, but should continue to build your expertise.")
-    else:
-        summary.append("Consider spending more time studying the fundamentals of your technical areas.")
-    return "\n".join(summary)
 
 # Initialize session state
 if "resume_text" not in st.session_state:
@@ -471,6 +520,8 @@ if "debug_skills" not in st.session_state:
     st.session_state.debug_skills = []
 if "raw_resume_text" not in st.session_state:
     st.session_state.raw_resume_text = ""
+if "interview_history" not in st.session_state:
+    st.session_state.interview_history = []  # List to store past interviews
 
 def add_message(role, content):
     st.session_state.chat_messages.append({"role": role, "content": content})
@@ -501,6 +552,30 @@ with st.sidebar:
     max_q = st.slider("Number of Questions", min_value=3, max_value=10, value=st.session_state.max_questions)
     if max_q != st.session_state.max_questions:
         st.session_state.max_questions = max_q
+    
+    st.subheader("Interview History")
+    if st.session_state.interview_history:
+        for idx, record in enumerate(st.session_state.interview_history):
+            with st.expander(f"Interview {idx+1}: {record['candidate_name']} ({record['date']})"):
+                st.write(f"**Average Score:** {record['avg_score']:.1f}/100")
+                st.write(f"**Rating:** {record['rating']}")
+                st.write("**Skills:**")
+                for category, skills in record['skills'].items():
+                    st.write(f"- {category.capitalize()}: {', '.join(skills)}")
+                st.write("**Questions and Scores:**")
+                for i, q in enumerate(record['questions']):
+                    if q['question'] in record['evaluations']:
+                        eval_data = record['evaluations'][q['question']]
+                        st.write(f"- Q{i+1}: {q['question']} (Score: {eval_data['evaluation'].get('score', 0)}/100)")
+                if st.button(f"Download PDF (Interview {idx+1})", key=f"download_{idx}"):
+                    try:
+                        pdf_path = export_results_as_pdf(record)
+                        with open(pdf_path, "rb") as f:
+                            pdf_bytes = f.read()
+                        pdf_b64 = base64.b64encode(pdf_bytes).decode()
+                        st.markdown(f'<a href="data:application/pdf;base64,{pdf_b64}" download="{os.path.basename(pdf_path)}">Download PDF</a>', unsafe_allow_html=True)
+                    except Exception as e:
+                        st.error(f"Error generating PDF: {str(e)}")
     
     if st.button("Start New Interview"):
         st.session_state.resume_text = ""
@@ -595,7 +670,7 @@ def process_user_input(user_input):
     elif st.session_state.bot_state == "interview":
         current_index = st.session_state.current_question_index
         current_question = st.session_state.questions[current_index]
-        evaluation = evaluate_answer_with_nlp(
+        evaluation = evaluate_answer_with_genai(
             question=current_question['question'],
             answer=user_input,
             expected_keywords=current_question['expected_keywords']
@@ -624,6 +699,19 @@ def process_user_input(user_input):
             total_score = sum(data["evaluation"].get("score", 0) for data in evaluations.values())
             avg_score = total_score / len(evaluations) if evaluations else 0
             rating = "Excellent" if avg_score >= 85 else "Good" if avg_score >= 70 else "Average" if avg_score >= 50 else "Needs Improvement"
+            
+            # Save interview to history
+            interview_record = {
+                "candidate_name": st.session_state.candidate_name or "Candidate",
+                "date": st.session_state.interview_date,
+                "avg_score": avg_score,
+                "rating": rating,
+                "skills": st.session_state.skills,
+                "questions": st.session_state.questions,
+                "evaluations": st.session_state.evaluations
+            }
+            st.session_state.interview_history.append(interview_record)
+            
             summary = f"""
             ## Interview Complete!
             Thank you for completing the technical interview practice session. Here's your performance summary:
@@ -632,7 +720,7 @@ def process_user_input(user_input):
             Would you like to:
             1. Review your answers and feedback
             2. Export your results as PDF
-            3. Generate a detailed interview summary
+            3. View past interview history
             4. Start a new interview
             Just let me know what you'd like to do next!
             """
@@ -657,46 +745,46 @@ def process_user_input(user_input):
         
         elif "pdf" in user_input.lower() or "export" in user_input.lower():
             try:
-                evaluations = st.session_state.evaluations
-                total_score = sum(data["evaluation"].get("score", 0) for data in evaluations.values())
-                avg_score = total_score / len(evaluations) if evaluations else 0
-                rating = "Excellent" if avg_score >= 85 else "Good" if avg_score >= 70 else "Average" if avg_score >= 50 else "Needs Improvement"
-                pdf_path = export_results_as_pdf(
-                    st.session_state.candidate_name or "Candidate",
-                    st.session_state.interview_date,
-                    avg_score,
-                    rating,
-                    st.session_state.skills,
-                    st.session_state.evaluations,
-                    st.session_state.questions
-                )
+                interview_record = {
+                    "candidate_name": st.session_state.candidate_name or "Candidate",
+                    "date": st.session_state.interview_date,
+                    "avg_score": sum(data["evaluation"].get("score", 0) for data in st.session_state.evaluations.values()) / len(st.session_state.evaluations) if st.session_state.evaluations else 0,
+                    "rating": "Excellent" if avg_score >= 85 else "Good" if avg_score >= 70 else "Average" if avg_score >= 50 else "Needs Improvement",
+                    "skills": st.session_state.skills,
+                    "questions": st.session_state.questions,
+                    "evaluations": st.session_state.evaluations
+                }
+                pdf_path = export_results_as_pdf(interview_record)
                 with open(pdf_path, "rb") as f:
                     pdf_bytes = f.read()
                 pdf_b64 = base64.b64encode(pdf_bytes).decode()
-                pdf_link = f'<a href="data:application/pdf;base64,{pdf_b64}" download="interview_results.pdf">Download Interview Results (PDF)</a>'
+                pdf_link = f'<a href="data:application/pdf;base64,{pdf_b64}" download="{os.path.basename(pdf_path)}">Download Interview Results (PDF)</a>'
                 add_message("assistant", f"Your interview results are ready! {pdf_link}")
             except Exception as e:
                 add_message("assistant", f"Sorry, there was an error generating the PDF: {str(e)}")
         
-        elif "summary" in user_input.lower() or "detailed" in user_input.lower():
-            evaluations = st.session_state.evaluations
-            total_score = sum(data["evaluation"].get("score", 0) for data in evaluations.values())
-            avg_score = total_score / len(evaluations) if evaluations else 0
-            rating = "Excellent" if avg_score >= 85 else "Good" if avg_score >= 70 else "Average" if avg_score >= 50 else "Needs Improvement"
-            summary = generate_interview_summary(
-                st.session_state.candidate_name or "Candidate",
-                st.session_state.interview_date,
-                avg_score,
-                rating,
-                st.session_state.skills,
-                st.session_state.evaluations,
-                st.session_state.questions
-            )
-            add_message("assistant", summary)
-            summary_text = summary.encode()
-            summary_b64 = base64.b64encode(summary_text).decode()
-            summary_link = f'<a href="data:text/markdown;base64,{summary_b64}" download="interview_summary.md">Download Summary (Markdown)</a>'
-            add_message("assistant", f"You can also download this summary: {summary_link}")
+        elif "history" in user_input.lower() or "past" in user_input.lower():
+            if not st.session_state.interview_history:
+                add_message("assistant", "No past interviews found. Complete an interview to start building your history!")
+            else:
+                history_message = "## Past Interview History\n\n"
+                for idx, record in enumerate(st.session_state.interview_history):
+                    history_message += f"### Interview {idx+1}: {record['candidate_name']} ({record['date']})\n"
+                    history_message += f"**Average Score:** {record['avg_score']:.1f}/100\n"
+                    history_message += f"**Rating:** {record['rating']}\n"
+                    history_message += "**Skills:**\n"
+                    for category, skills in record['skills'].items():
+                        history_message += f"- {category.capitalize()}: {', '.join(skills)}\n"
+                    history_message += "**Questions and Answers:**\n"
+                    for i, q in enumerate(record['questions']):
+                        if q['question'] in record['evaluations']:
+                            eval_data = record['evaluations'][q['question']]
+                            history_message += f"- Q{i+1}: {q['question']}\n"
+                            history_message += f"  - **Answer:** {eval_data['answer']}\n"
+                            history_message += f"  - **Score:** {eval_data['evaluation'].get('score', 0)}/100\n"
+                            history_message += f"  - **Feedback:** {eval_data['evaluation'].get('feedback', 'No feedback')}\n"
+                    history_message += "\n---\n"
+                add_message("assistant", history_message)
         
         elif "new" in user_input.lower() or "start" in user_input.lower() or "again" in user_input.lower():
             st.session_state.resume_text = ""
@@ -716,7 +804,7 @@ def process_user_input(user_input):
             What would you like to do next?
             1. **Review your answers and feedback**
             2. **Export your results as PDF**
-            3. **Generate a detailed interview summary**
+            3. **View past interview history**
             4. **Start a new interview**
             Just let me know what option you prefer.
             """)
@@ -767,31 +855,22 @@ if st.session_state.interview_complete:
         total_score = sum(data["evaluation"].get("score", 0) for data in evaluations.values())
         avg_score = total_score / len(evaluations) if evaluations else 0
         rating = "Excellent" if avg_score >= 85 else "Good" if avg_score >= 70 else "Average" if avg_score >= 50 else "Needs Improvement"
-        summary = generate_interview_summary(
-            st.session_state.candidate_name or "Candidate",
-            st.session_state.interview_date,
-            avg_score,
-            rating,
-            st.session_state.skills,
-            st.session_state.evaluations,
-            st.session_state.questions
-        )
-        st.markdown(get_download_link(summary, "interview_summary.md", "Download Summary (Markdown)"), unsafe_allow_html=True)
         
         if st.button("Generate PDF"):
             try:
-                pdf_path = export_results_as_pdf(
-                    st.session_state.candidate_name or "Candidate",
-                    st.session_state.interview_date,
-                    avg_score,
-                    rating,
-                    st.session_state.skills,
-                    st.session_state.evaluations,
-                    st.session_state.questions
-                )
+                interview_record = {
+                    "candidate_name": st.session_state.candidate_name or "Candidate",
+                    "date": st.session_state.interview_date,
+                    "avg_score": avg_score,
+                    "rating": rating,
+                    "skills": st.session_state.skills,
+                    "questions": st.session_state.questions,
+                    "evaluations": st.session_state.evaluations
+                }
+                pdf_path = export_results_as_pdf(interview_record)
                 with open(pdf_path, "rb") as f:
                     pdf_bytes = f.read()
                 pdf_b64 = base64.b64encode(pdf_bytes).decode()
-                st.markdown(f'<a href="data:application/pdf;base64,{pdf_b64}" download="interview_results.pdf">Download Interview Results (PDF)</a>', unsafe_allow_html=True)
+                st.markdown(f'<a href="data:application/pdf;base64,{pdf_b64}" download="{os.path.basename(pdf_path)}">Download Interview Results (PDF)</a>', unsafe_allow_html=True)
             except Exception as e:
                 st.error(f"Error generating PDF: {str(e)}")
