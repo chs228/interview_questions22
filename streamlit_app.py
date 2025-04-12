@@ -32,16 +32,15 @@ except ImportError:
 
 from fpdf import FPDF
 
-# Firebase configuration (store in Streamlit secrets)
+# Firebase configuration (loaded from Streamlit secrets)
 firebase_config = {
-    "apiKey": "AIzaSyDvFFLr-Fjhma2yae7rx3r7Ei0J6bXJmmI",
-    "authDomain": "client-2bbfc.firebaseapp.com",
-    "databaseURL": "https://client-2bbfc-default-rtdb.firebaseio.com",
-    "projectId": "client-2bbfc",
-    "storageBucket": "client-2bbfc.firebasestorage.app",
-    "messagingSenderId": "971318119261",
-    "appId": "1:971318119261:web:0cf9b5f290f1589326f6b4",
-    "measurementId": "G-5YHQGXBXJG"
+    "apiKey": st.secrets.get("firebase_api_key", "your-api-key-here"),
+    "authDomain": st.secrets.get("firebase_auth_domain", "your-project-id.firebaseapp.com"),
+    "projectId": st.secrets.get("firebase_project_id", "your-project-id"),
+    "storageBucket": st.secrets.get("firebase_storage_bucket", "your-project-id.appspot.com"),
+    "messagingSenderId": st.secrets.get("firebase_messaging_sender_id", "your-sender-id"),
+    "appId": st.secrets.get("firebase_app_id", "your-app-id"),
+    "databaseURL": ""  # Not needed for auth
 }
 
 # Initialize Firebase
@@ -49,12 +48,12 @@ try:
     firebase = pyrebase.initialize_app(firebase_config)
     auth = firebase.auth()
 except Exception as e:
-    st.error(f"Firebase initialization failed: {e}")
+    st.error(f"Firebase initialization failed: {e}. Check secrets.")
     auth = None
 
-# Email configuration (store in Streamlit secrets)
-EMAIL_SENDER = st.secrets.get("email_sender", "")
-EMAIL_PASSWORD = st.secrets.get("email_password", "")
+# Email configuration (loaded from Streamlit secrets)
+EMAIL_SENDER = st.secrets.get("email_sender", "your-email@gmail.com")
+EMAIL_PASSWORD = st.secrets.get("email_password", "your-app-password")
 SMTP_SERVER = st.secrets.get("smtp_server", "smtp.gmail.com")
 SMTP_PORT = st.secrets.get("smtp_port", 587)
 
@@ -106,7 +105,7 @@ TECHNICAL_QUESTIONS = {
          "expected_keywords": ["scope", "let", "const", "var", "block", "hoisting"]},
     ],
     'sql': [
-        {"question": "What’s the difference between INNER and LEFT JOIN?", 
+        {"question": "What's the difference between INNER and LEFT JOIN?", 
          "expected_keywords": ["inner", "left", "join", "matching", "all", "records"]},
         {"question": "How do you optimize a slow SQL query?", 
          "expected_keywords": ["index", "execution plan", "query", "optimize", "performance"]},
@@ -118,7 +117,7 @@ TECHNICAL_QUESTIONS = {
          "expected_keywords": ["common table expression", "with", "query", "temporary", "recursive"]},
     ],
     'aws': [
-        {"question": "What’s the difference between EC2 and Lambda?", 
+        {"question": "What's the difference between EC2 and Lambda?", 
          "expected_keywords": ["instance", "serverless", "EC2", "Lambda", "scaling", "compute"]},
         {"question": "How do you secure an AWS environment?", 
          "expected_keywords": ["IAM", "security group", "encryption", "access", "policy"]},
@@ -136,7 +135,7 @@ GENERIC_QUESTIONS = [
      "expected_keywords": ["challenge", "project", "solution", "overcome", "team", "result"]},
     {"question": "How do you stay updated with technology?", 
      "expected_keywords": ["learning", "research", "practice", "community", "courses"]},
-    {"question": "What’s your approach to debugging?", 
+    {"question": "What's your approach to debugging?", 
      "expected_keywords": ["debugging", "logs", "breakpoint", "systematic", "testing", "root cause"]},
     {"question": "How do you prioritize project tasks?", 
      "expected_keywords": ["prioritize", "deadline", "impact", "stakeholder", "planning"]},
@@ -146,9 +145,9 @@ GENERIC_QUESTIONS = [
 
 # Messages
 WELCOME_MESSAGES = [
-    "Welcome to TechInterviewBot! Let’s practice your technical skills.",
-    "Hello! Ready for a technical interview? I’m here to help.",
-    "Hi! Let’s sharpen your interview skills with tailored questions.",
+    "Welcome to TechInterviewBot! Let's practice your technical skills.",
+    "Hello! Ready for a technical interview? I'm here to help.",
+    "Hi! Let's sharpen your interview skills with tailored questions.",
 ]
 
 RESUME_PROMPTS = [
@@ -159,19 +158,19 @@ RESUME_PROMPTS = [
 
 SKILL_MESSAGES = [
     "Great! Here are the skills I found in your resume:",
-    "Thanks! I’ve identified these skills from your resume:",
+    "Thanks! I've identified these skills from your resume:",
     "Based on your resume, here are your key skills:",
 ]
 
 INTERVIEW_START_MESSAGES = [
-    "Let’s start with questions based on your skills!",
+    "Let's start with questions based on your skills!",
     "Ready? Here come some technical questions!",
     "The interview begins with tailored questions.",
 ]
 
 QUESTION_TRANSITIONS = [
     "Next question:",
-    "Here’s another one:",
+    "Here's another one:",
     "Moving on:",
 ]
 
@@ -182,13 +181,13 @@ EVALUATION_POSITIVE = [
 ]
 
 EVALUATION_AVERAGE = [
-    "Good try! You covered some points, but there’s room to grow.",
+    "Good try! You covered some points, but there's room to grow.",
     "Decent answer, but you could add more detail.",
     "Not bad! Try expanding on the concepts.",
 ]
 
 EVALUATION_NEEDS_IMPROVEMENT = [
-    "You missed some key concepts. Let’s review those.",
+    "You missed some key concepts. Let's review those.",
     "Needs more depth. Want some pointers?",
     "Try including more technical details.",
 ]
@@ -457,10 +456,11 @@ def export_results_as_pdf(interview_record):
 def login():
     if "user" not in st.session_state:
         st.session_state.user = None
+        st.session_state.user_email = None
     
     if not st.session_state.user:
         st.title("Login to Technical Interview Chatbot")
-        login_option = st.selectbox("Choose login method", ["Email/Password", "Sign Up", "Google"])
+        login_option = st.selectbox("Choose login method", ["Email/Password", "Sign Up"])
         
         if login_option == "Email/Password":
             email = st.text_input("Email")
@@ -469,6 +469,7 @@ def login():
                 try:
                     user = auth.sign_in_with_email_and_password(email, password)
                     st.session_state.user = user
+                    st.session_state.user_email = user['email']
                     st.success("Logged in successfully!")
                     st.rerun()
                 except Exception as e:
@@ -481,14 +482,11 @@ def login():
                 try:
                     user = auth.create_user_with_email_and_password(email, password)
                     st.session_state.user = user
+                    st.session_state.user_email = user['email']
                     st.success("Account created and logged in!")
                     st.rerun()
                 except Exception as e:
                     st.error(f"Sign up failed: {e}")
-        
-        elif login_option == "Google":
-            st.warning("Google Sign-In requires client-side JavaScript. Use Email/Password for Streamlit Cloud.")
-            # Note: Google Sign-In needs a frontend setup (e.g., FirebaseUI). For Streamlit, consider deploying with a static HTML login page if needed.
         
         return False
     return True
@@ -596,6 +594,7 @@ if login():
         
         if st.button("Logout"):
             st.session_state.user = None
+            st.session_state.user_email = None
             st.rerun()
 
     # Main app
@@ -760,8 +759,7 @@ if login():
                     add_message("assistant", f"PDF generation error: {e}")
             
             elif "email" in user_input.lower() or "send" in user_input.lower():
-                email_input = st.text_input("Enter your email to receive results:")
-                if email_input:
+                if st.session_state.user_email:
                     try:
                         evaluations = st.session_state.evaluations
                         total_score = sum(data["evaluation"].get("score", 0) for data in evaluations.values())
@@ -776,12 +774,14 @@ if login():
                             "evaluations": st.session_state.evaluations
                         }
                         pdf_path = export_results_as_pdf(interview_record)
-                        if send_email(email_input, interview_record, pdf_path):
-                            add_message("assistant", f"Results sent to {email_input}!")
+                        if send_email(st.session_state.user_email, interview_record, pdf_path):
+                            add_message("assistant", f"Results sent to {st.session_state.user_email}!")
                         else:
                             add_message("assistant", "Failed to send email. Try downloading the PDF.")
                     except Exception as e:
                         add_message("assistant", f"Error: {e}")
+                else:
+                    add_message("assistant", "No email available. Please log in again.")
             
             elif "history" in user_input.lower() or "past" in user_input.lower():
                 if not st.session_state.interview_history:
@@ -820,7 +820,7 @@ if login():
                 st.rerun()
             else:
                 add_message("assistant", """
-                What’s next?
+                What's next?
                 1. Review answers
                 2. Export PDF
                 3. Send results via email
@@ -893,9 +893,8 @@ if login():
                     st.error(f"PDF generation error: {e}")
             
             st.subheader("Send Results")
-            email_input = st.text_input("Enter email for results:", key="email_input")
             if st.button("Send Email"):
-                if email_input:
+                if st.session_state.user_email:
                     try:
                         interview_record = {
                             "candidate_name": st.session_state.candidate_name or "Candidate",
@@ -907,9 +906,11 @@ if login():
                             "evaluations": st.session_state.evaluations
                         }
                         pdf_path = export_results_as_pdf(interview_record)
-                        if send_email(email_input, interview_record, pdf_path):
-                            st.success(f"Results sent to {email_input}!")
+                        if send_email(st.session_state.user_email, interview_record, pdf_path):
+                            st.success(f"Results sent to {st.session_state.user_email}!")
                         else:
                             st.error("Failed to send email. Try downloading the PDF.")
                     except Exception as e:
                         st.error(f"Error: {e}")
+                else:
+                    st.error("No email available. Please log in again.")
