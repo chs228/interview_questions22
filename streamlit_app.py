@@ -1,6 +1,6 @@
 import streamlit as st
 
-# Set page config as the first command
+# Must be first
 st.set_page_config(page_title="Technical Interview Chatbot", layout="wide")
 
 import re
@@ -10,352 +10,291 @@ import os
 import random
 from datetime import datetime
 import requests
+from textblob import TextBlob, Word
 
-# Set NLTK data path (for Streamlit Cloud or custom setups)
-os.environ['NLTK_DATA'] = os.path.join(os.getcwd(), 'nltk_data')
-
-# Check for optional dependencies
+# Dependencies
 try:
     import PyPDF2
 except ImportError:
     PyPDF2 = None
-    st.error("PyPDF2 is not installed. Please install it with: pip install PyPDF2")
+    st.error("PyPDF2 missing. Install with: pip install PyPDF2")
 
 try:
     import docx
 except ImportError:
     docx = None
-    st.error("python-docx is not installed. Please install it with: pip install python-docx")
+    st.error("python-docx missing. Install with: pip install python-docx")
 
 from fpdf import FPDF
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from email.mime.application import MIMEApplication
 
-# NLTK import with robust error handling
-try:
-    import nltk
-    from nltk.tokenize import word_tokenize
-    from nltk.corpus import stopwords
-    from nltk.stem import WordNetLemmatizer
-    
-    try:
-        nltk.data.find('tokenizers/punkt_tab')
-        nltk.data.find('corpora/stopwords')
-        nltk.data.find('corpora/wordnet')
-        NLP_ENABLED = True
-    except LookupError:
-        st.warning("NLTK data (punkt, stopwords, or wordnet) could not be found. NLP features will be disabled.")
-        NLP_ENABLED = False
-except ImportError:
-    nltk = None
-    NLP_ENABLED = False
-    st.warning("NLTK is not installed. NLP features will be disabled. Install with: pip install nltk")
-
-# Placeholder for generative AI API configuration
-GENAI_API_KEY = os.getenv("XAI_API_KEY")  # Set this in your environment
+# Generative AI setup
+GENAI_API_KEY = os.getenv("XAI_API_KEY")
 GENAI_API_URL = "https://api.xai.com/v1/evaluate"  # Placeholder
 GENAI_ENABLED = bool(GENAI_API_KEY)
 
+# Skill definitions
 COMMON_SKILLS = {
-    'programming': ['python', 'java', 'javascript', 'html', 'css', 'c++', 'c#', 'ruby', 'php', 'sql', 'r'],
+    'programming': ['python', 'java', 'javascript', 'html', 'css', 'c++', 'c#', 'ruby', 'php', 'sql'],
     'frameworks': ['react', 'angular', 'vue', 'django', 'flask', 'spring', 'node.js', 'express', '.net'],
     'databases': ['sql', 'mysql', 'postgresql', 'mongodb', 'oracle', 'sqlite', 'redis'],
-    'cloud': ['aws', 'azure', 'gcp', 'google cloud', 'docker', 'kubernetes'],
+    'cloud': ['aws', 'azure', 'gcp', 'docker', 'kubernetes'],
     'tools': ['git', 'github', 'jira', 'jenkins', 'agile', 'scrum'],
-    'soft_skills': ['communication', 'leadership', 'teamwork', 'problem solving', 'time management'],
 }
 
+# Question bank
 TECHNICAL_QUESTIONS = {
     'python': [
-        {"question": "Explain how you would implement a decorator in Python.", 
+        {"question": "Explain Python decorators with an example.", 
          "expected_keywords": ["function", "wrapper", "decorator", "@", "arguments", "return"]},
-        {"question": "How would you handle exceptions in Python?", 
+        {"question": "How do you handle exceptions in Python?", 
          "expected_keywords": ["try", "except", "finally", "raise", "error", "handling"]},
-        {"question": "Describe list comprehensions and their advantages in Python.", 
+        {"question": "What are list comprehensions in Python?", 
          "expected_keywords": ["list", "comprehension", "concise", "loop", "condition", "performance"]},
-        {"question": "What is a generator in Python and how is it used?", 
+        {"question": "Explain Python generators and their benefits.", 
          "expected_keywords": ["generator", "yield", "iterator", "memory", "lazy", "evaluation"]},
+        {"question": "How does Python manage memory?", 
+         "expected_keywords": ["garbage collection", "reference", "counting", "memory", "del"]},
     ],
     'java': [
-        {"question": "Explain the concept of inheritance in Java.", 
+        {"question": "What is inheritance in Java?", 
          "expected_keywords": ["extends", "class", "parent", "child", "super", "override"]},
-        {"question": "How do you manage memory in Java?", 
-         "expected_keywords": ["garbage collection", "heap", "stack", "reference", "finalize", "memory"]},
-        {"question": "What are Java streams and how are they used?", 
+        {"question": "How does Java handle memory management?", 
+         "expected_keywords": ["garbage collection", "heap", "stack", "reference", "finalize"]},
+        {"question": "Explain Java streams API.", 
          "expected_keywords": ["stream", "functional", "map", "filter", "collect", "pipeline"]},
-        {"question": "Describe synchronization in Java multithreading.", 
-         "expected_keywords": ["synchronized", "thread", "lock", "monitor", "concurrency", "block"]},
+        {"question": "What is synchronization in Java threads?", 
+         "expected_keywords": ["synchronized", "thread", "lock", "monitor", "concurrency"]},
+        {"question": "Describe Java's Optional class.", 
+         "expected_keywords": ["optional", "null", "avoid", "check", "orElse", "present"]},
     ],
     'javascript': [
-        {"question": "Explain closures in JavaScript.", 
+        {"question": "What are closures in JavaScript?", 
          "expected_keywords": ["function", "scope", "variable", "closure", "lexical", "access"]},
-        {"question": "How does event delegation work in JavaScript?", 
+        {"question": "Explain event delegation in JavaScript.", 
          "expected_keywords": ["event", "delegation", "bubble", "target", "listener", "parent"]},
-        {"question": "What are promises and async/await in JavaScript?", 
+        {"question": "What are promises and async/await?", 
          "expected_keywords": ["promise", "async", "await", "resolve", "reject", "asynchronous"]},
-        {"question": "Describe the JavaScript event loop.", 
-         "expected_keywords": ["event loop", "call stack", "queue", "async", "callback", "render"]},
+        {"question": "How does the JavaScript event loop work?", 
+         "expected_keywords": ["event loop", "call stack", "queue", "async", "callback"]},
+        {"question": "Difference between let, const, and var?", 
+         "expected_keywords": ["scope", "let", "const", "var", "block", "hoisting"]},
     ],
     'sql': [
-        {"question": "Explain the difference between INNER JOIN and LEFT JOIN.", 
+        {"question": "What’s the difference between INNER and LEFT JOIN?", 
          "expected_keywords": ["inner", "left", "join", "matching", "all", "records"]},
-        {"question": "How would you optimize a slow SQL query?", 
-         "expected_keywords": ["index", "execution plan", "query", "optimize", "performance", "analyze"]},
-        {"question": "What are triggers in SQL?", 
+        {"question": "How do you optimize a slow SQL query?", 
+         "expected_keywords": ["index", "execution plan", "query", "optimize", "performance"]},
+        {"question": "What are SQL triggers?", 
          "expected_keywords": ["trigger", "event", "table", "insert", "update", "delete"]},
-        {"question": "Explain ACID properties in databases.", 
-         "expected_keywords": ["atomicity", "consistency", "isolation", "durability", "transaction", "acid"]},
-    ],
-    'react': [
-        {"question": "Explain the component lifecycle in React.", 
-         "expected_keywords": ["mount", "update", "unmount", "render", "effect", "component"]},
-        {"question": "How do you optimize performance in React?", 
-         "expected_keywords": ["memo", "useCallback", "useMemo", "render", "optimization", "state"]},
-        {"question": "What is the Context API in React?", 
-         "expected_keywords": ["context", "provider", "consumer", "state", "props", "global"]},
-        {"question": "Describe React hooks and their benefits.", 
-         "expected_keywords": ["hooks", "functional", "state", "effect", "rules", "useState"]},
+        {"question": "Explain ACID properties.", 
+         "expected_keywords": ["atomicity", "consistency", "isolation", "durability", "transaction"]},
+        {"question": "What is a CTE in SQL?", 
+         "expected_keywords": ["common table expression", "with", "query", "temporary", "recursive"]},
     ],
     'aws': [
-        {"question": "Explain the difference between EC2 and Lambda.", 
+        {"question": "What’s the difference between EC2 and Lambda?", 
          "expected_keywords": ["instance", "serverless", "EC2", "Lambda", "scaling", "compute"]},
         {"question": "How do you secure an AWS environment?", 
-         "expected_keywords": ["IAM", "security group", "encryption", "access", "policy", "role"]},
-        {"question": "What is S3 and how is it used?", 
+         "expected_keywords": ["IAM", "security group", "encryption", "access", "policy"]},
+        {"question": "What is AWS S3 used for?", 
          "expected_keywords": ["S3", "storage", "bucket", "object", "access", "policy"]},
-        {"question": "Describe VPC and its components.", 
-         "expected_keywords": ["VPC", "subnet", "route table", "gateway", "security group", "network"]},
+        {"question": "Explain VPC components.", 
+         "expected_keywords": ["VPC", "subnet", "route table", "gateway", "security group"]},
+        {"question": "What is AWS CloudFormation?", 
+         "expected_keywords": ["CloudFormation", "template", "infrastructure", "stack", "provision"]},
     ],
 }
 
 GENERIC_QUESTIONS = [
-    {"question": "Describe a technical challenge you faced and how you resolved it.", 
+    {"question": "Describe a technical challenge you solved.", 
      "expected_keywords": ["challenge", "project", "solution", "overcome", "team", "result"]},
-    {"question": "How do you stay updated with new technologies?", 
-     "expected_keywords": ["learning", "research", "practice", "community", "documentation", "courses"]},
-    {"question": "Explain your approach to debugging complex issues.", 
+    {"question": "How do you stay updated with technology?", 
+     "expected_keywords": ["learning", "research", "practice", "community", "courses"]},
+    {"question": "What’s your approach to debugging?", 
      "expected_keywords": ["debugging", "logs", "breakpoint", "systematic", "testing", "root cause"]},
-    {"question": "How do you prioritize tasks in a project?", 
-     "expected_keywords": ["prioritize", "deadline", "impact", "stakeholder", "planning", "agile"]},
+    {"question": "How do you prioritize project tasks?", 
+     "expected_keywords": ["prioritize", "deadline", "impact", "stakeholder", "planning"]},
+    {"question": "Explain a time you improved a process.", 
+     "expected_keywords": ["process", "improvement", "efficiency", "solution", "impact"]},
 ]
 
+# Messages
 WELCOME_MESSAGES = [
-    "Welcome to TechInterviewBot! I'm here to help you practice your technical interview skills.",
-    "Hello! I'm your Technical Interview Assistant. Let's prepare you for your next tech interview.",
-    "Hi there! Ready to sharpen your technical interview skills? I'm here to help you practice.",
-    "Welcome aboard! I'm your AI interview coach. Let's see how well you can handle technical questions."
+    "Welcome to TechInterviewBot! Let’s practice your technical skills.",
+    "Hello! Ready for a technical interview? I’m here to help.",
+    "Hi! Let’s sharpen your interview skills with tailored questions.",
 ]
 
 RESUME_PROMPTS = [
-    "To get started, please upload your resume or paste its content so I can tailor questions to your skills.",
-    "Let's begin by analyzing your resume. Please upload it or paste the text so I can customize the interview.",
-    "First, I'll need to see your resume to generate relevant questions. Upload a file or paste the text below.",
-    "To create a personalized interview experience, I need to review your resume first. Upload or paste it below."
+    "Upload your resume or paste its content to start.",
+    "Share your resume to tailor the interview questions.",
+    "I need your resume to generate relevant questions.",
 ]
 
 SKILL_MESSAGES = [
-    "Great! I've analyzed your resume and identified these key skills:",
-    "Thanks for sharing your resume! Based on my analysis, here are the skills I've identified:",
-    "Perfect! After reviewing your resume, I've extracted these technical skills:",
-    "I've processed your resume and found these skills that we can focus on:"
+    "Great! Here are the skills I found in your resume:",
+    "Thanks! I’ve identified these skills from your resume:",
+    "Based on your resume, here are your key skills:",
 ]
 
 INTERVIEW_START_MESSAGES = [
-    "Now let's begin the interview! I'll ask you a series of technical questions related to your skills.",
-    "Ready to start? I've prepared some technical questions based on your experience.",
-    "Let's dive into the technical interview! I'll ask questions related to your strongest skills.",
-    "The interview is about to begin! I'll evaluate your answers to help improve your skills."
+    "Let’s start with questions based on your skills!",
+    "Ready? Here come some technical questions!",
+    "The interview begins with tailored questions.",
 ]
 
 QUESTION_TRANSITIONS = [
-    "Let's move on to the next question:",
-    "Here's another question for you:",
-    "Now, I'd like to ask you about:",
-    "Let's continue with this question:",
-    "For the next question:",
-    "Moving forward:",
+    "Next question:",
+    "Here’s another one:",
+    "Moving on:",
 ]
 
 EVALUATION_POSITIVE = [
-    "Great answer! You've covered the key points effectively.",
-    "Excellent response! Your understanding of the concept is clear.",
-    "Well done! Your explanation was thorough and accurate.",
-    "Very good! You demonstrated strong knowledge in this area."
+    "Great answer! You hit the key points.",
+    "Excellent! Your response was clear and accurate.",
+    "Well done! That was a strong answer.",
 ]
 
 EVALUATION_AVERAGE = [
-    "Good attempt! You covered some key points, but there's room for improvement.",
-    "That's a decent answer, but you could expand on a few concepts.",
-    "Not bad! You have the basic understanding, but consider adding more depth.",
-    "You're on the right track, but try to be more specific in your explanations."
+    "Good try! You covered some points, but there’s room to grow.",
+    "Decent answer, but you could add more detail.",
+    "Not bad! Try expanding on the concepts.",
 ]
 
 EVALUATION_NEEDS_IMPROVEMENT = [
-    "You've made an attempt, but there are some key concepts missing.",
-    "Your answer needs more technical depth. Let me suggest some areas to focus on.",
-    "I see you have some understanding, but there are important points you didn't address.",
-    "This response could be improved by including more specific technical details."
+    "You missed some key concepts. Let’s review those.",
+    "Needs more depth. Want some pointers?",
+    "Try including more technical details.",
 ]
 
+# NLP functions using TextBlob
 def preprocess_text(text):
-    if not NLP_ENABLED:
-        return text.lower()
+    """Tokenize and lemmatize text using TextBlob."""
     try:
-        tokens = word_tokenize(text.lower())
-        stop_words = set(stopwords.words('english'))
-        tokens = [token for token in tokens if token not in stop_words and token.isalnum()]
-        lemmatizer = WordNetLemmatizer()
-        tokens = [lemmatizer.lemmatize(token) for token in tokens]
+        blob = TextBlob(text.lower())
+        tokens = [Word(word).lemmatize() for word in blob.words if word.isalnum()]
+        # Simple stopword removal (common words)
+        stop_words = {'a', 'an', 'and', 'are', 'as', 'at', 'be', 'by', 'for', 'from', 'has', 'he', 
+                      'in', 'is', 'it', 'its', 'of', 'on', 'that', 'the', 'to', 'was', 'were', 'will', 'with'}
+        tokens = [t for t in tokens if t not in stop_words]
         return " ".join(tokens)
-    except LookupError:
-        st.error("NLTK data is missing. Falling back to basic text processing.")
+    except Exception as e:
+        st.warning(f"Text processing error: {e}. Using basic processing.")
         return text.lower()
-
-def extract_skills_with_nlp(text):
-    """Extract skills with strict context-based matching using NLTK."""
-    if not NLP_ENABLED:
-        return extract_skills_basic(text)
-    
-    raw_text = text.lower()
-    identified_skills = {}
-    debug_matches = []
-    
-    SKILL_ALIASES = {
-        'python': ['python'],
-        'java': ['java'],
-        'javascript': ['javascript'],
-        'sql': ['sql'],
-        'aws': ['aws'],
-        'react': ['react'],
-        'django': ['django'],
-        'flask': ['flask'],
-        'git': ['git'],
-        'github': ['github'],
-    }
-    
-    context_patterns = r'(?:skills|experience|proficient in|worked with|knowledge of|using|expertise in|developed with)'
-    
-    for category, skill_list in COMMON_SKILLS.items():
-        found_skills = set()
-        for skill in skill_list:
-            aliases = SKILL_ALIASES.get(skill, [skill])
-            for alias in aliases:
-                pattern = rf'{context_patterns}\s*[^.\n]*\b{re.escape(alias)}\b[^.\n]*'
-                matches = re.finditer(pattern, raw_text)
-                for match in matches:
-                    found_skills.add(skill)
-                    debug_matches.append(f"Matched '{skill}' in: '{match.group()}'")
-        if found_skills:
-            identified_skills[category] = list(found_skills)
-    
-    st.session_state.debug_skills = debug_matches
-    st.session_state.raw_resume_text = raw_text
-    return identified_skills
-
-def extract_skills_basic(text):
-    """Basic skill extraction with strict context."""
-    text = text.lower()
-    identified_skills = {}
-    context_patterns = r'(?:skills|experience|proficient in|worked with|knowledge of|using|expertise in|developed with)'
-    
-    for category, skill_list in COMMON_SKILLS.items():
-        found_skills = set()
-        for skill in skill_list:
-            pattern = rf'{context_patterns}\s*[^.\n]*\b{re.escape(skill)}\b[^.\n]*'
-            if re.search(pattern, text):
-                found_skills.add(skill)
-        if found_skills:
-            identified_skills[category] = list(found_skills)
-    return identified_skills
 
 def extract_skills(text):
+    """Extract skills using TextBlob and regex for context."""
     if not text:
         return {}
-    return extract_skills_with_nlp(text) if NLP_ENABLED else extract_skills_basic(text)
+    
+    try:
+        raw_text = text.lower()
+        blob = TextBlob(raw_text)
+        identified_skills = {}
+        debug_matches = []
+        
+        context_patterns = r'(?:skills|experience|proficient in|worked with|knowledge of|using|expertise in)'
+        
+        for category, skill_list in COMMON_SKILLS.items():
+            found_skills = set()
+            for skill in skill_list:
+                # Strict regex to match skill in context
+                pattern = rf'{context_patterns}\s*[^.\n]*\b{re.escape(skill)}\b[^.\n]*'
+                matches = re.finditer(pattern, raw_text)
+                for match in matches:
+                    # Verify with TextBlob tokens
+                    context = match.group()
+                    if skill in [Word(w).lemmatize() for w in TextBlob(context).words]:
+                        found_skills.add(skill)
+                        debug_matches.append(f"Matched '{skill}' in: '{context[:50]}...'")
+            if found_skills:
+                identified_skills[category] = list(found_skills)
+        
+        st.session_state.debug_skills = debug_matches
+        st.session_state.raw_resume_text = raw_text
+        return identified_skills
+    except Exception as e:
+        st.warning(f"Skill extraction error: {e}. Using basic extraction.")
+        # Fallback: basic regex
+        identified_skills = {}
+        for category, skill_list in COMMON_SKILLS.items():
+            found_skills = set()
+            for skill in skill_list:
+                pattern = rf'{context_patterns}\s*[^.\n]*\b{re.escape(skill)}\b[^.\n]*'
+                if re.search(pattern, text.lower()):
+                    found_skills.add(skill)
+            if found_skills:
+                identified_skills[category] = list(found_skills)
+        return identified_skills
 
-def evaluate_answer_with_nlp(question, answer, expected_keywords):
+def evaluate_answer(question, answer, expected_keywords):
+    """Evaluate answer using TextBlob for keyword matching."""
     if not answer.strip():
         return {"score": 0, "feedback": "No answer provided.", "missing_concepts": expected_keywords}
     
-    if not NLP_ENABLED:
-        keyword_count = sum(1 for keyword in expected_keywords if keyword.lower() in answer.lower())
+    try:
+        processed_answer = preprocess_text(answer)
+        processed_keywords = [Word(kw).lemmatize() for kw in expected_keywords]
+        keyword_count = sum(1 for kw in processed_keywords if kw in processed_answer)
+        score = min(keyword_count / len(expected_keywords), 1.0) * 100
+        missing = [kw for kw in expected_keywords if Word(kw).lemmatize() not in processed_answer]
+        feedback = get_feedback_message(score)
+        if missing:
+            feedback += f" Consider including: {', '.join(missing[:3])}."
+        return {"score": score, "feedback": feedback, "missing_concepts": missing}
+    except Exception as e:
+        st.warning(f"Evaluation error: {e}. Using basic scoring.")
+        # Fallback: basic keyword matching
+        keyword_count = sum(1 for kw in expected_keywords if kw.lower() in answer.lower())
         score = min(keyword_count / len(expected_keywords), 1.0) * 100
         missing = [k for k in expected_keywords if k.lower() not in answer.lower()]
-        return {"score": score, "feedback": "Basic keyword matching applied.", "missing_concepts": missing}
-    
-    processed_answer = preprocess_text(answer)
-    processed_keywords = [preprocess_text(kw) for kw in expected_keywords]
-    keyword_count = sum(1 for kw in processed_keywords if kw in processed_answer)
-    score = min(keyword_count / len(expected_keywords), 1.0) * 100
-    missing = [kw for kw in expected_keywords if preprocess_text(kw) not in processed_answer]
-    
-    feedback = get_feedback_message(score)
-    if missing:
-        feedback += f" Consider mentioning: {', '.join(missing[:3])}."
-    
-    return {"score": score, "feedback": feedback, "missing_concepts": missing}
+        feedback = get_feedback_message(score)
+        return {"score": score, "feedback": feedback, "missing_concepts": missing}
 
 def evaluate_answer_with_genai(question, answer, expected_keywords):
+    """Evaluate using generative AI (placeholder)."""
     if not answer.strip():
         return {"score": 0, "feedback": "No answer provided.", "missing_concepts": expected_keywords}
     
     if not GENAI_ENABLED:
-        st.warning("Generative AI evaluation is disabled. Falling back to NLP evaluation.")
-        return evaluate_answer_with_nlp(question, answer, expected_keywords)
+        return evaluate_answer(question, answer, expected_keywords)
     
     try:
         prompt = f"""
-        Evaluate the following answer to a technical interview question for accuracy, depth, and relevance.
+        Evaluate this technical interview answer for accuracy and depth.
         Question: {question}
         Answer: {answer}
-        Expected key concepts: {', '.join(expected_keywords)}
+        Expected concepts: {', '.join(expected_keywords)}
         
-        Provide:
-        - A score from 0 to 100 based on how well the answer addresses the question and includes the key concepts.
-        - A brief feedback paragraph explaining the score.
-        - A list of missing concepts (if any).
+        Return JSON with:
+        - score (0-100)
+        - feedback (string)
+        - missing_concepts (list)
         """
-        
-        headers = {
-            "Authorization": f"Bearer {GENAI_API_KEY}",
-            "Content-Type": "application/json"
-        }
-        payload = {
-            "prompt": prompt,
-            "max_tokens": 500,
-            "temperature": 0.7
-        }
-        
+        headers = {"Authorization": f"Bearer {GENAI_API_KEY}", "Content-Type": "application/json"}
+        payload = {"prompt": prompt, "max_tokens": 500, "temperature": 0.7}
         response = requests.post(GENAI_API_URL, json=payload, headers=headers)
         response.raise_for_status()
         result = response.json()
         
-        score = result.get("score", 50)
-        feedback = result.get("feedback", "Evaluation provided by AI.")
-        missing_concepts = result.get("missing_concepts", [])
-        
         return {
-            "score": min(max(score, 0), 100),
-            "feedback": feedback,
-            "missing_concepts": missing_concepts
+            "score": min(max(result.get("score", 50), 0), 100),
+            "feedback": result.get("feedback", "AI evaluation completed."),
+            "missing_concepts": result.get("missing_concepts", [])
         }
     except Exception as e:
-        st.error(f"Error with generative AI evaluation: {str(e)}. Falling back to NLP evaluation.")
-        return evaluate_answer_with_nlp(question, answer, expected_keywords)
+        st.warning(f"GenAI evaluation failed: {e}. Using TextBlob evaluation.")
+        return evaluate_answer(question, answer, expected_keywords)
 
+# File processing
 def extract_text_from_pdf(pdf_file):
     if PyPDF2 is None:
         return ""
     try:
         pdf_reader = PyPDF2.PdfReader(pdf_file)
-        text = ""
-        for page in pdf_reader.pages:
-            text += page.extract_text() or ""
-        return text
+        return "".join(page.extract_text() or "" for page in pdf_reader.pages)
     except Exception as e:
-        st.error(f"Error processing PDF: {e}")
+        st.error(f"PDF processing error: {e}")
         return ""
 
 def extract_text_from_docx(docx_file):
@@ -363,50 +302,33 @@ def extract_text_from_docx(docx_file):
         return ""
     try:
         doc = docx.Document(docx_file)
-        text = ""
-        for paragraph in doc.paragraphs:
-            text += paragraph.text + "\n"
-        return text
+        return "\n".join(paragraph.text for paragraph in doc.paragraphs)
     except Exception as e:
-        st.error(f"Error processing DOCX: {e}")
+        st.error(f"DOCX processing error: {e}")
         return ""
 
-def generate_technical_questions(skills, max_questions=7):
+# Question generation
+def generate_technical_questions(skills, max_questions=5):
     all_possible_questions = []
     all_skills = [skill for category, skill_list in skills.items() for skill in skill_list]
     
-    # Randomly select skills to ensure variety
-    if all_skills:
-        selected_skills = random.sample(all_skills, min(len(all_skills), 3))
-    else:
-        selected_skills = []
+    selected_skills = random.sample(all_skills, min(len(all_skills), 3)) if all_skills else []
     
-    # Collect questions for selected skills
     for skill in selected_skills:
         if skill in TECHNICAL_QUESTIONS:
-            skill_questions = TECHNICAL_QUESTIONS[skill]
-            all_possible_questions.extend(random.sample(skill_questions, min(len(skill_questions), 2)))
+            all_possible_questions.extend(random.sample(TECHNICAL_QUESTIONS[skill], min(2, len(TECHNICAL_QUESTIONS[skill]))))
     
-    # Fill remaining slots with generic questions or other skill questions
     remaining_slots = max_questions - len(all_possible_questions)
     if remaining_slots > 0:
-        generic_available = random.sample(GENERIC_QUESTIONS, min(len(GENERIC_QUESTIONS), remaining_slots))
-        all_possible_questions.extend(generic_available)
-        remaining_slots -= len(generic_available)
+        all_possible_questions.extend(random.sample(GENERIC_QUESTIONS, min(remaining_slots, len(GENERIC_QUESTIONS))))
+        remaining_slots = max_questions - len(all_possible_questions)
     
-    # If still needed, add more random technical questions
     if remaining_slots > 0:
-        all_tech_questions = []
-        for skill in TECHNICAL_QUESTIONS:
-            if skill not in selected_skills:
-                all_tech_questions.extend(TECHNICAL_QUESTIONS[skill])
-        if all_tech_questions:
-            all_possible_questions.extend(random.sample(all_tech_questions, min(len(all_tech_questions), remaining_slots)))
+        other_questions = [q for skill in TECHNICAL_QUESTIONS if skill not in selected_skills for q in TECHNICAL_QUESTIONS[skill]]
+        all_possible_questions.extend(random.sample(other_questions, min(remaining_slots, len(other_questions))))
     
-    # Shuffle the final list for randomness
     random.shuffle(all_possible_questions)
     
-    # Ensure uniqueness
     unique_questions = []
     question_texts = set()
     for q in all_possible_questions:
@@ -425,12 +347,16 @@ def get_feedback_message(score):
         return random.choice(EVALUATION_NEEDS_IMPROVEMENT)
 
 def format_skills_message(skills):
-    message = ""
-    for category, skill_list in skills.items():
-        message += f"**{category.capitalize()}**: {', '.join(skill_list)}\n"
-    return message
+    return "\n".join(f"**{category.capitalize()}**: {', '.join(skill_list)}" for category, skill_list in skills.items())
 
+# PDF export
 def export_results_as_pdf(interview_record):
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", "B", 16)
+    pdf.cell(0, 10, "Technical Interview Results", ln=True, align="C")
+    pdf.ln(5)
+    
     candidate_name = interview_record.get("candidate_name", "Candidate")
     interview_date = interview_record.get("date", datetime.now().strftime("%Y-%m-%d %H:%M"))
     avg_score = interview_record.get("avg_score", 0)
@@ -439,32 +365,30 @@ def export_results_as_pdf(interview_record):
     evaluations = interview_record.get("evaluations", {})
     questions = interview_record.get("questions", [])
     
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_font("Arial", "B", 16)
-    pdf.cell(0, 10, "Technical Interview Results", ln=True, align="C")
-    pdf.ln(5)
     pdf.set_font("Arial", "B", 12)
     pdf.cell(0, 10, f"Candidate: {candidate_name}", ln=True)
     pdf.cell(0, 10, f"Date: {interview_date}", ln=True)
     pdf.ln(5)
+    
     pdf.set_font("Arial", "B", 14)
     pdf.cell(0, 10, "Summary", ln=True)
     pdf.set_font("Arial", "", 12)
     pdf.cell(0, 10, f"Overall Score: {avg_score:.1f}/100", ln=True)
     pdf.cell(0, 10, f"Rating: {rating}", ln=True)
     pdf.ln(5)
+    
     pdf.set_font("Arial", "B", 14)
     pdf.cell(0, 10, "Skills", ln=True)
     pdf.set_font("Arial", "", 12)
     for category, skill_list in skills.items():
         pdf.set_font("Arial", "B", 12)
-        pdf.cell(0, 10, f"{category.capitalize()}", ln=True)
+        pdf.cell(0, 10, category.capitalize(), ln=True)
         pdf.set_font("Arial", "", 12)
         pdf.multi_cell(0, 10, ", ".join(skill_list))
     pdf.ln(5)
+    
     pdf.set_font("Arial", "B", 14)
-    pdf.cell(0, 10, "Interview Questions and Evaluations", ln=True)
+    pdf.cell(0, 10, "Questions and Evaluations", ln=True)
     for i, q in enumerate(questions):
         if q['question'] in evaluations:
             data = evaluations[q['question']]
@@ -476,7 +400,7 @@ def export_results_as_pdf(interview_record):
             pdf.set_font("Arial", "B", 12)
             pdf.cell(0, 10, f"Score: {evaluation.get('score', 'N/A')}/100", ln=True)
             pdf.set_font("Arial", "", 12)
-            pdf.multi_cell(0, 10, f"Feedback: {evaluation.get('feedback', 'No feedback available')}")
+            pdf.multi_cell(0, 10, f"Feedback: {evaluation.get('feedback', 'No feedback')}")
             missing = evaluation.get('missing_concepts', [])
             if missing:
                 pdf.set_font("Arial", "B", 12)
@@ -485,11 +409,12 @@ def export_results_as_pdf(interview_record):
                 for concept in missing:
                     pdf.cell(0, 10, f"- {concept}", ln=True)
             pdf.ln(5)
+    
     output_path = f"interview_results_{candidate_name}_{interview_date.replace(':', '-')}.pdf"
     pdf.output(output_path)
     return output_path
 
-# Initialize session state
+# Session state
 if "resume_text" not in st.session_state:
     st.session_state.resume_text = ""
 if "skills" not in st.session_state:
@@ -522,17 +447,18 @@ if "interview_history" not in st.session_state:
 def add_message(role, content):
     st.session_state.chat_messages.append({"role": role, "content": content})
 
+# Sidebar
 with st.sidebar:
-    st.header("Interview Bot Settings")
+    st.header("Interview Settings")
     if st.session_state.bot_state in ["wait_for_resume", "analyzing_resume"]:
-        st.info("Please upload your resume or paste its content to begin.")
+        st.info("Upload or paste your resume to begin.")
     elif st.session_state.bot_state == "interview":
-        st.subheader("Interview Progress")
+        st.subheader("Progress")
         progress = st.session_state.current_question_index / len(st.session_state.questions)
         st.progress(progress)
         st.write(f"Question {st.session_state.current_question_index}/{len(st.session_state.questions)}")
         if st.session_state.skills:
-            st.subheader("Your Skills Focus")
+            st.subheader("Skills Focus")
             for category, skills in st.session_state.skills.items():
                 with st.expander(category.capitalize()):
                     st.write(", ".join(skills))
@@ -571,7 +497,7 @@ with st.sidebar:
                         pdf_b64 = base64.b64encode(pdf_bytes).decode()
                         st.markdown(f'<a href="data:application/pdf;base64,{pdf_b64}" download="{os.path.basename(pdf_path)}">Download PDF</a>', unsafe_allow_html=True)
                     except Exception as e:
-                        st.error(f"Error generating PDF: {str(e)}")
+                        st.error(f"PDF generation error: {e}")
     
     if st.button("Start New Interview"):
         st.session_state.resume_text = ""
@@ -587,9 +513,10 @@ with st.sidebar:
         st.session_state.raw_resume_text = ""
         st.rerun()
 
+# Main app
 st.title("Technical Interview Chatbot 🤖")
 
-uploaded_file = st.file_uploader("Upload your resume (PDF or DOCX)", type=["pdf", "docx"], key="resume_upload")
+uploaded_file = st.file_uploader("Upload resume (PDF or DOCX)", type=["pdf", "docx"], key="resume_upload")
 chat_container = st.container()
 
 def process_user_input(user_input):
@@ -598,24 +525,23 @@ def process_user_input(user_input):
     if st.session_state.bot_state == "wait_for_resume":
         if len(user_input.split()) <= 3 and len(st.session_state.chat_messages) <= 3:
             st.session_state.candidate_name = user_input
-            add_message("assistant", f"Nice to meet you, {user_input}! Please upload your resume or paste its content so I can prepare relevant technical questions.")
+            add_message("assistant", f"Hi {user_input}! Please upload or paste your resume.")
             return
         
         st.session_state.resume_text = user_input
         st.session_state.bot_state = "analyzing_resume"
-        add_message("assistant", "Thanks for sharing your resume! I'm analyzing it to identify your technical skills...")
+        add_message("assistant", "Analyzing your resume for skills...")
         
         skills = extract_skills(user_input)
         if not skills:
-            add_message("assistant", "I couldn't identify specific technical skills from your resume. Let's add some manually. What are your top technical skills? (e.g., Python, Java, AWS)")
+            add_message("assistant", "No technical skills found. List some skills (e.g., Python, Java, AWS).")
             st.session_state.bot_state = "manual_skills"
         else:
             st.session_state.skills = skills
             skill_message = random.choice(SKILL_MESSAGES) + "\n\n" + format_skills_message(skills)
             if st.session_state.debug_skills:
                 skill_message += "\n\n**Debug Info:**\n" + "\n".join(st.session_state.debug_skills)
-            skill_message += f"\n\n**Raw Resume Text (first 200 chars):** {st.session_state.raw_resume_text[:200]}..."
-            skill_message += "\n\nAre these skills accurate? You can add more skills if needed, or type 'start interview' when you're ready."
+            skill_message += "\n\nAre these correct? Add more skills or type 'start interview'."
             add_message("assistant", skill_message)
             st.session_state.bot_state = "confirm_skills"
     
@@ -623,45 +549,37 @@ def process_user_input(user_input):
         skills_input = user_input.lower()
         manual_skills = {}
         for category, skill_list in COMMON_SKILLS.items():
-            found_skills = []
-            for skill in skill_list:
-                if skill in skills_input:
-                    found_skills.append(skill)
+            found_skills = [skill for skill in skill_list if skill in skills_input]
             if found_skills:
                 manual_skills[category] = found_skills
         
         if not manual_skills:
-            manual_skills['programming'] = ['python', 'java']
-            manual_skills['tools'] = ['git']
+            manual_skills = {'programming': ['python'], 'tools': ['git']}
         
         st.session_state.skills = manual_skills
-        skill_message = "Thanks! I've added these skills to your profile:\n\n" + format_skills_message(manual_skills)
-        skill_message += "\n\nReady to start the interview? Type 'start interview' when you're ready."
+        skill_message = "Added skills:\n\n" + format_skills_message(manual_skills) + "\n\nType 'start interview' to begin."
         add_message("assistant", skill_message)
         st.session_state.bot_state = "confirm_skills"
     
     elif st.session_state.bot_state == "confirm_skills":
-        if "start interview" in user_input.lower() or "ready" in user_input.lower() or "yes" in user_input.lower():
+        if any(x in user_input.lower() for x in ["start interview", "ready", "yes"]):
             technical_questions = generate_technical_questions(st.session_state.skills, st.session_state.max_questions)
             st.session_state.questions = technical_questions
             st.session_state.current_question_index = 0
-            start_message = random.choice(INTERVIEW_START_MESSAGES)
-            first_question = technical_questions[0]["question"] if technical_questions else "Tell me about your background in technology."
-            add_message("assistant", f"{start_message}\n\n**Question 1:** {first_question}")
+            first_question = technical_questions[0]["question"] if technical_questions else "Tell me about your tech background."
+            add_message("assistant", f"{random.choice(INTERVIEW_START_MESSAGES)}\n\n**Question 1:** {first_question}")
             st.session_state.bot_state = "interview"
         else:
             new_skills = extract_skills(user_input)
             if new_skills:
                 for category, skills_list in new_skills.items():
                     if category in st.session_state.skills:
-                        for skill in skills_list:
-                            if skill not in st.session_state.skills[category]:
-                                st.session_state.skills[category].append(skill)
+                        st.session_state.skills[category].extend([s for s in skills_list if s not in st.session_state.skills[category]])
                     else:
                         st.session_state.skills[category] = skills_list
-                add_message("assistant", f"I've updated your skills profile. Type 'start interview' when you're ready to begin.")
+                add_message("assistant", "Skills updated. Type 'start interview' to begin.")
             else:
-                add_message("assistant", "I'm ready whenever you are. Type 'start interview' to begin.")
+                add_message("assistant", "Type 'start interview' when ready.")
     
     elif st.session_state.bot_state == "interview":
         current_index = st.session_state.current_question_index
@@ -674,11 +592,10 @@ def process_user_input(user_input):
         st.session_state.evaluations[current_question['question']] = {"answer": user_input, "evaluation": evaluation}
         
         score = evaluation.get('score', 0)
-        feedback_message = get_feedback_message(score)
-        feedback = f"{feedback_message}\n\n**Score:** {score}/100\n\n{evaluation.get('feedback', '')}"
+        feedback = f"{get_feedback_message(score)}\n\n**Score:** {score}/100\n\n{evaluation.get('feedback', '')}"
         missing = evaluation.get('missing_concepts', [])
         if missing:
-            feedback += "\n\n**Areas to improve:**\n" + "\n".join(f"- {concept}" for concept in missing)
+            feedback += "\n\n**Improve:**\n" + "\n".join(f"- {concept}" for concept in missing)
         add_message("assistant", feedback)
         
         current_index += 1
@@ -686,8 +603,7 @@ def process_user_input(user_input):
         
         if current_index < len(st.session_state.questions):
             next_question = st.session_state.questions[current_index]["question"]
-            transition = random.choice(QUESTION_TRANSITIONS)
-            add_message("assistant", f"{transition}\n\n**Question {current_index + 1}:** {next_question}")
+            add_message("assistant", f"{random.choice(QUESTION_TRANSITIONS)}\n\n**Question {current_index + 1}:** {next_question}")
         else:
             st.session_state.bot_state = "complete"
             st.session_state.interview_complete = True
@@ -696,7 +612,6 @@ def process_user_input(user_input):
             avg_score = total_score / len(evaluations) if evaluations else 0
             rating = "Excellent" if avg_score >= 85 else "Good" if avg_score >= 70 else "Average" if avg_score >= 50 else "Needs Improvement"
             
-            # Save interview to history
             interview_record = {
                 "candidate_name": st.session_state.candidate_name or "Candidate",
                 "date": st.session_state.interview_date,
@@ -708,35 +623,32 @@ def process_user_input(user_input):
             }
             st.session_state.interview_history.append(interview_record)
             
-            summary = f"""
+            add_message("assistant", f"""
             ## Interview Complete!
-            Thank you for completing the technical interview practice session. Here's your performance summary:
             **Overall Score:** {avg_score:.1f}/100
             **Rating:** {rating}
-            Would you like to:
-            1. Review your answers and feedback
-            2. Export your results as PDF
-            3. View past interview history
-            4. Start a new interview
-            Just let me know what you'd like to do next!
-            """
-            add_message("assistant", summary)
+            Options:
+            1. Review answers
+            2. Export PDF
+            3. View history
+            4. Start new interview
+            """)
     
     elif st.session_state.bot_state == "complete":
         if "review" in user_input.lower() or "answers" in user_input.lower():
-            review = "## Your Interview Responses and Feedback\n\n"
+            review = "## Your Responses\n\n"
             for i, q in enumerate(st.session_state.questions):
                 if q['question'] in st.session_state.evaluations:
                     data = st.session_state.evaluations[q['question']]
                     evaluation = data["evaluation"]
                     review += f"### Question {i+1}: {q['question']}\n"
-                    review += f"**Your answer:** {data['answer']}\n\n"
+                    review += f"**Answer:** {data['answer']}\n"
                     review += f"**Score:** {evaluation.get('score', 0)}/100\n"
-                    review += f"**Feedback:** {evaluation.get('feedback', 'No feedback available')}\n\n"
+                    review += f"**Feedback:** {evaluation.get('feedback', 'No feedback')}\n"
                     missing = evaluation.get('missing_concepts', [])
                     if missing:
-                        review += "**Areas for improvement:**\n" + "\n".join(f"- {concept}" for concept in missing)
-                    review += "\n---\n\n"
+                        review += "**Improve:**\n" + "\n".join(f"- {concept}" for concept in missing)
+                    review += "\n---\n"
             add_message("assistant", review)
         
         elif "pdf" in user_input.lower() or "export" in user_input.lower():
@@ -754,35 +666,33 @@ def process_user_input(user_input):
                 with open(pdf_path, "rb") as f:
                     pdf_bytes = f.read()
                 pdf_b64 = base64.b64encode(pdf_bytes).decode()
-                pdf_link = f'<a href="data:application/pdf;base64,{pdf_b64}" download="{os.path.basename(pdf_path)}">Download Interview Results (PDF)</a>'
-                add_message("assistant", f"Your interview results are ready! {pdf_link}")
+                add_message("assistant", f"PDF ready! <a href='data:application/pdf;base64,{pdf_b64}' download='{os.path.basename(pdf_path)}'>Download</a>")
             except Exception as e:
-                add_message("assistant", f"Sorry, there was an error generating the PDF: {str(e)}")
+                add_message("assistant", f"PDF error: {e}")
         
         elif "history" in user_input.lower() or "past" in user_input.lower():
             if not st.session_state.interview_history:
-                add_message("assistant", "No past interviews found. Complete an interview to start building your history!")
+                add_message("assistant", "No past interviews. Complete one to build history!")
             else:
-                history_message = "## Past Interview History\n\n"
+                history_message = "## Interview History\n\n"
                 for idx, record in enumerate(st.session_state.interview_history):
                     history_message += f"### Interview {idx+1}: {record['candidate_name']} ({record['date']})\n"
-                    history_message += f"**Average Score:** {record['avg_score']:.1f}/100\n"
+                    history_message += f"**Score:** {record['avg_score']:.1f}/100\n"
                     history_message += f"**Rating:** {record['rating']}\n"
                     history_message += "**Skills:**\n"
                     for category, skills in record['skills'].items():
                         history_message += f"- {category.capitalize()}: {', '.join(skills)}\n"
-                    history_message += "**Questions and Answers:**\n"
+                    history_message += "**Questions:**\n"
                     for i, q in enumerate(record['questions']):
                         if q['question'] in record['evaluations']:
                             eval_data = record['evaluations'][q['question']]
                             history_message += f"- Q{i+1}: {q['question']}\n"
                             history_message += f"  - **Answer:** {eval_data['answer']}\n"
                             history_message += f"  - **Score:** {eval_data['evaluation'].get('score', 0)}/100\n"
-                            history_message += f"  - **Feedback:** {eval_data['evaluation'].get('feedback', 'No feedback')}\n"
                     history_message += "\n---\n"
                 add_message("assistant", history_message)
         
-        elif "new" in user_input.lower() or "start" in user_input.lower() or "again" in user_input.lower():
+        elif "new" in user_input.lower() or "start" in user_input.lower():
             st.session_state.resume_text = ""
             st.session_state.skills = {}
             st.session_state.questions = []
@@ -797,14 +707,14 @@ def process_user_input(user_input):
             st.rerun()
         else:
             add_message("assistant", """
-            What would you like to do next?
-            1. **Review your answers and feedback**
-            2. **Export your results as PDF**
-            3. **View past interview history**
-            4. **Start a new interview**
-            Just let me know what option you prefer.
+            What’s next?
+            1. Review answers
+            2. Export PDF
+            3. View history
+            4. Start new interview
             """)
 
+# Handle file upload
 if uploaded_file is not None and not st.session_state.resume_text:
     file_extension = uploaded_file.name.split(".")[-1].lower()
     if file_extension == "pdf":
@@ -813,52 +723,49 @@ if uploaded_file is not None and not st.session_state.resume_text:
         resume_text = extract_text_from_docx(uploaded_file)
     else:
         resume_text = ""
-        st.error("Unsupported file format. Please upload a PDF or DOCX file.")
+        st.error("Please upload a PDF or DOCX file.")
     
     if resume_text:
         st.session_state.resume_text = resume_text
         st.session_state.bot_state = "analyzing_resume"
-        st.session_state.chat_messages = [
-            {"role": "assistant", "content": "Thanks for uploading your resume! I'm analyzing it to identify your technical skills..."}
-        ]
+        st.session_state.chat_messages = [{"role": "assistant", "content": "Analyzing your resume..."}]
         skills = extract_skills(resume_text)
         if not skills:
-            add_message("assistant", "I couldn't identify specific technical skills from your resume. Let's add some manually. What are your top technical skills? (e.g., Python, Java, AWS)")
+            add_message("assistant", "No skills found. List some skills (e.g., Python, Java, AWS).")
             st.session_state.bot_state = "manual_skills"
         else:
             st.session_state.skills = skills
             skill_message = random.choice(SKILL_MESSAGES) + "\n\n" + format_skills_message(skills)
             if st.session_state.debug_skills:
-                skill_message += "\n\n**Debug Info:**\n" + "\n".join(st.session_state.debug_skills)
-            skill_message += f"\n\n**Raw Resume Text (first 200 chars):** {st.session_state.raw_resume_text[:200]}..."
-            skill_message += "\n\nAre these skills accurate? You can add more skills if needed, or type 'start interview' when you're ready."
+                skill_message += "\n\n**Debug:**\n" + "\n".join(st.session_state.debug_skills)
+            skill_message += "\n\nCorrect? Add skills or type 'start interview'."
             add_message("assistant", skill_message)
             st.session_state.bot_state = "confirm_skills"
 
+# Chat interface
 with chat_container:
     for message in st.session_state.chat_messages:
         with st.chat_message(message["role"]):
-            st.markdown(message["content"])
+            st.markdown(message["content"], unsafe_allow_html=True)
     
     if user_input := st.chat_input("Type here"):
         process_user_input(user_input)
         st.rerun()
 
+# Export on completion
 if st.session_state.interview_complete:
     with st.sidebar:
-        st.subheader("Export Results")
+        st.subheader("Export")
         evaluations = st.session_state.evaluations
         total_score = sum(data["evaluation"].get("score", 0) for data in evaluations.values())
         avg_score = total_score / len(evaluations) if evaluations else 0
-        rating = "Excellent" if avg_score >= 85 else "Good" if avg_score >= 70 else "Average" if avg_score >= 50 else "Needs Improvement"
-        
         if st.button("Generate PDF"):
             try:
                 interview_record = {
                     "candidate_name": st.session_state.candidate_name or "Candidate",
                     "date": st.session_state.interview_date,
                     "avg_score": avg_score,
-                    "rating": rating,
+                    "rating": "Excellent" if avg_score >= 85 else "Good" if avg_score >= 70 else "Average" if avg_score >= 50 else "Needs Improvement",
                     "skills": st.session_state.skills,
                     "questions": st.session_state.questions,
                     "evaluations": st.session_state.evaluations
@@ -867,6 +774,6 @@ if st.session_state.interview_complete:
                 with open(pdf_path, "rb") as f:
                     pdf_bytes = f.read()
                 pdf_b64 = base64.b64encode(pdf_bytes).decode()
-                st.markdown(f'<a href="data:application/pdf;base64,{pdf_b64}" download="{os.path.basename(pdf_path)}">Download Interview Results (PDF)</a>', unsafe_allow_html=True)
+                st.markdown(f'<a href="data:application/pdf;base64,{pdf_b64}" download="{os.path.basename(pdf_path)}">Download PDF</a>', unsafe_allow_html=True)
             except Exception as e:
-                st.error(f"Error generating PDF: {str(e)}")
+                st.error(f"PDF error: {e}")
