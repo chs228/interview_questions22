@@ -47,7 +47,6 @@ COMMON_SKILLS = {
     'soft_skills': ['communication', 'leadership', 'teamwork', 'problem solving', 'time management'],
 }
 
-# Expanded technical questions for each skill
 TECHNICAL_QUESTIONS = {
     'python': [
         {"question": "Explain how you would implement a decorator in Python.", 
@@ -55,21 +54,7 @@ TECHNICAL_QUESTIONS = {
         {"question": "How would you handle exceptions in Python?", 
          "expected_keywords": ["try", "except", "finally", "raise", "error", "handling"]},
         {"question": "Describe the difference between a list and a tuple in Python.", 
-         "expected_keywords": ["mutable", "immutable", "list", "tuple", "ordered", "elements"]},
-        {"question": "How do you handle concurrent operations in Python?",
-         "expected_keywords": ["threading", "multiprocessing", "GIL", "asyncio", "concurrent", "futures"]},
-        {"question": "Explain Python's memory management and garbage collection.",
-         "expected_keywords": ["reference counting", "garbage collector", "memory", "objects", "allocation", "cycle"]},
-        {"question": "What are Python generators and how do they work?",
-         "expected_keywords": ["yield", "iterator", "memory", "efficient", "lazy", "next"]},
-        {"question": "How would you optimize a slow Python script?",
-         "expected_keywords": ["profiling", "algorithms", "data structures", "cython", "numpy", "vectorization"]},
-        {"question": "Explain the difference between shallow copy and deep copy in Python.",
-         "expected_keywords": ["copy", "deepcopy", "reference", "nested", "objects", "mutable"]},
-        {"question": "How do you use context managers in Python?",
-         "expected_keywords": ["with", "context", "enter", "exit", "resources", "cleanup"]},
-        {"question": "Describe Python's approach to OOP principles.",
-         "expected_keywords": ["class", "inheritance", "polymorphism", "encapsulation", "self", "method"]}
+         "expected_keywords": ["mutable", "immutable", "list", "tuple", "ordered", "elements"]}
     ],
     'java': [
         {"question": "Explain the concept of inheritance in Java.", 
@@ -77,21 +62,7 @@ TECHNICAL_QUESTIONS = {
         {"question": "How do you handle exceptions in Java?", 
          "expected_keywords": ["try", "catch", "finally", "throw", "throws", "exception"]},
         {"question": "What is the difference between an interface and an abstract class in Java?", 
-         "expected_keywords": ["implement", "extend", "methods", "abstract", "interface", "multiple"]},
-        {"question": "Explain Java's memory management and garbage collection.",
-         "expected_keywords": ["heap", "stack", "JVM", "garbage collection", "memory", "objects"]},
-        {"question": "How do you handle concurrency in Java?",
-         "expected_keywords": ["synchronized", "thread", "lock", "atomic", "concurrent", "volatile"]},
-        {"question": "What are Java streams and how do you use them?",
-         "expected_keywords": ["stream", "filter", "map", "collect", "functional", "lambda"]},
-        {"question": "Explain the principle of 'Write Once, Run Anywhere' in Java.",
-         "expected_keywords": ["JVM", "bytecode", "platform", "independent", "compile", "interpret"]},
-        {"question": "How do annotations work in Java?",
-         "expected_keywords": ["annotation", "metadata", "runtime", "compiler", "reflection", "processor"]},
-        {"question": "What are the different types of references in Java?",
-         "expected_keywords": ["strong", "weak", "soft", "phantom", "garbage", "collection"]},
-        {"question": "Explain Java generics and their benefits.",
-         "expected_keywords": ["generics", "type", "safety", "compile", "erasure", "collections"]}
+         "expected_keywords": ["implement", "extend", "methods", "abstract", "interface", "multiple"]}
     ],
     'javascript': [
         {"question": "Explain closures in JavaScript.", 
@@ -99,21 +70,7 @@ TECHNICAL_QUESTIONS = {
         {"question": "How does asynchronous programming work in JavaScript?", 
          "expected_keywords": ["promise", "async", "await", "callback", "then", "event loop"]},
         {"question": "What's the difference between var, let, and const in JavaScript?", 
-         "expected_keywords": ["scope", "hoisting", "reassign", "block", "function", "declaration"]},
-        {"question": "Explain prototypal inheritance in JavaScript.",
-         "expected_keywords": ["prototype", "inheritance", "chain", "object", "__proto__", "constructor"]},
-        {"question": "How does the 'this' keyword work in JavaScript?",
-         "expected_keywords": ["context", "bind", "call", "apply", "arrow", "function"]},
-        {"question": "What are JavaScript modules and how do you use them?",
-         "expected_keywords": ["import", "export", "module", "ESM", "CommonJS", "bundler"]},
-        {"question": "Explain event bubbling and capturing in JavaScript.",
-         "expected_keywords": ["bubbling", "capturing", "propagation", "target", "currentTarget", "stopPropagation"]},
-        {"question": "How does JavaScript's event loop work?",
-         "expected_keywords": ["stack", "queue", "event loop", "microtask", "macrotask", "asynchronous"]},
-        {"question": "What are Web APIs and how do they interact with JavaScript?",
-         "expected_keywords": ["DOM", "fetch", "localStorage", "browser", "API", "asynchronous"]},
-        {"question": "Describe JavaScript's memory management and garbage collection.",
-         "expected_keywords": ["garbage collection", "memory leak", "reference", "closure", "heap", "mark-and-sweep"]}
+         "expected_keywords": ["scope", "hoisting", "reassign", "block", "function", "declaration"]}
     ],
     'sql': [
         {"question": "Explain the difference between INNER JOIN and LEFT JOIN.", 
@@ -121,21 +78,7 @@ TECHNICAL_QUESTIONS = {
         {"question": "How would you optimize a slow SQL query?", 
          "expected_keywords": ["index", "execution plan", "query", "optimize", "performance", "analyze"]},
         {"question": "What is database normalization?", 
-         "expected_keywords": ["normal form", "redundancy", "dependency", "relation", "table", "normalize"]},
-        {"question": "Explain the concept of transactions in SQL.",
-         "expected_keywords": ["ACID", "commit", "rollback", "transaction", "atomic", "consistency"]},
-        {"question": "How do you handle deadlocks in a database?",
-         "expected_keywords": ["deadlock", "transaction", "lock", "timeout", "detection", "prevention"]},
-        {"question": "What are indexes and how do they improve query performance?",
-         "expected_keywords": ["index", "b-tree", "search", "performance", "clustered", "non-clustered"]},
-        {"question": "Explain the difference between DELETE, TRUNCATE, and DROP.",
-         "expected_keywords": ["delete", "truncate", "drop", "table", "record", "structure"]},
-        {"question": "How do you implement data partitioning in SQL?",
-         "expected_keywords": ["partition", "shard", "horizontal", "vertical", "table", "performance"]},
-        {"question": "What are stored procedures and triggers?",
-         "expected_keywords": ["stored procedure", "trigger", "function", "execute", "event", "automate"]},
-        {"question": "Explain subqueries and their types in SQL.",
-         "expected_keywords": ["subquery", "nested", "correlated", "uncorrelated", "performance", "optimization"]}
+         "expected_keywords": ["normal form", "redundancy", "dependency", "relation", "table", "normalize"]}
     ],
     'react': [
         {"question": "Explain the component lifecycle in React.", 
@@ -143,21 +86,7 @@ TECHNICAL_QUESTIONS = {
         {"question": "How do you manage state in React applications?", 
          "expected_keywords": ["useState", "useReducer", "state", "props", "context", "Redux"]},
         {"question": "What are hooks in React and why were they introduced?", 
-         "expected_keywords": ["hooks", "functional", "state", "effect", "rules", "useState"]},
-        {"question": "Explain the concept of Virtual DOM in React.",
-         "expected_keywords": ["virtual DOM", "reconciliation", "diffing", "rendering", "performance", "update"]},
-        {"question": "How do you handle side effects in React components?",
-         "expected_keywords": ["useEffect", "dependency array", "cleanup", "lifecycle", "async", "fetch"]},
-        {"question": "What are Higher-Order Components (HOCs) in React?",
-         "expected_keywords": ["HOC", "component", "wrapping", "reuse", "props", "enhance"]},
-        {"question": "Explain the Context API and when you would use it.",
-         "expected_keywords": ["context", "provider", "consumer", "useContext", "global", "state"]},
-        {"question": "How do you optimize performance in React applications?",
-         "expected_keywords": ["memo", "useMemo", "useCallback", "lazy loading", "code splitting", "performance"]},
-        {"question": "What are React portals and when would you use them?",
-         "expected_keywords": ["portal", "DOM", "render", "modal", "overlay", "parent"]},
-        {"question": "Explain the difference between controlled and uncontrolled components.",
-         "expected_keywords": ["controlled", "uncontrolled", "input", "form", "state", "ref"]}
+         "expected_keywords": ["hooks", "functional", "state", "effect", "rules", "useState"]}
     ],
     'aws': [
         {"question": "Explain the difference between EC2 and Lambda.", 
@@ -165,25 +94,10 @@ TECHNICAL_QUESTIONS = {
         {"question": "How do you handle security in AWS?", 
          "expected_keywords": ["IAM", "security group", "encryption", "access", "policy", "role"]},
         {"question": "Describe the AWS services you've worked with.", 
-         "expected_keywords": ["S3", "EC2", "Lambda", "RDS", "CloudFront", "DynamoDB"]},
-        {"question": "What is Auto Scaling in AWS and how does it work?",
-         "expected_keywords": ["scaling", "EC2", "group", "load", "policy", "metric"]},
-        {"question": "Explain AWS VPC and its components.",
-         "expected_keywords": ["VPC", "subnet", "route table", "internet gateway", "NACL", "security group"]},
-        {"question": "How do you deploy applications in AWS?",
-         "expected_keywords": ["CodeDeploy", "Elastic Beanstalk", "CloudFormation", "pipeline", "CI/CD", "deployment"]},
-        {"question": "What are AWS S3 storage classes and when would you use each?",
-         "expected_keywords": ["standard", "infrequent access", "glacier", "cost", "retrieval", "durability"]},
-        {"question": "Explain AWS CloudFormation and Infrastructure as Code.",
-         "expected_keywords": ["template", "stack", "resource", "IaC", "provision", "automation"]},
-        {"question": "How do you monitor applications in AWS?",
-         "expected_keywords": ["CloudWatch", "logging", "metrics", "alarm", "event", "dashboard"]},
-        {"question": "What is AWS Identity and Access Management (IAM)?",
-         "expected_keywords": ["IAM", "user", "role", "policy", "permission", "authentication"]}
+         "expected_keywords": ["S3", "EC2", "Lambda", "RDS", "CloudFront", "DynamoDB"]}
     ],
 }
 
-# Expanded generic questions
 GENERIC_QUESTIONS = [
     {"question": "Tell me about a challenging project you worked on and how you overcame obstacles.", 
      "expected_keywords": ["challenge", "project", "solution", "overcome", "team", "result"]},
@@ -192,23 +106,7 @@ GENERIC_QUESTIONS = [
     {"question": "Describe your experience with agile development methodologies.", 
      "expected_keywords": ["agile", "scrum", "sprint", "kanban", "standup", "retrospective"]},
     {"question": "How do you ensure code quality in your projects?", 
-     "expected_keywords": ["testing", "review", "standards", "documentation", "refactoring", "clean"]},
-    {"question": "Describe a situation where you had to debug a complex issue. What was your approach?",
-     "expected_keywords": ["debug", "troubleshoot", "analyze", "problem", "solution", "methodology"]},
-    {"question": "How do you keep your technical skills up-to-date?",
-     "expected_keywords": ["learning", "courses", "practice", "community", "projects", "research"]},
-    {"question": "Tell me about a time when you had to make a technical decision with limited information.",
-     "expected_keywords": ["decision", "analysis", "risk", "information", "outcome", "process"]},
-    {"question": "How do you handle technical disagreements within a team?",
-     "expected_keywords": ["communication", "compromise", "discussion", "evidence", "respect", "resolution"]},
-    {"question": "Describe your approach to system design and architecture.",
-     "expected_keywords": ["scalability", "requirements", "tradeoffs", "design", "components", "architecture"]},
-    {"question": "How do you balance technical debt against delivering features?",
-     "expected_keywords": ["technical debt", "prioritize", "refactor", "balance", "quality", "delivery"]},
-    {"question": "Tell me about a time when you improved a process or system.",
-     "expected_keywords": ["improvement", "efficiency", "process", "impact", "measure", "implement"]},
-    {"question": "How do you approach documentation in your projects?",
-     "expected_keywords": ["documentation", "clarity", "audience", "purpose", "update", "importance"]}
+     "expected_keywords": ["testing", "review", "standards", "documentation", "refactoring", "clean"]}
 ]
 
 WELCOME_MESSAGES = [
@@ -280,7 +178,7 @@ def preprocess_text(text):
     return " ".join(tokens)
 
 def extract_skills_with_nlp(text):
-    """Extract skills with very strict context-based matching."""
+    """Extract skills with very strict context-based matching using NLTK."""
     if not NLP_ENABLED:
         return extract_skills_basic(text)
     
@@ -343,59 +241,26 @@ def extract_skills(text):
     return extract_skills_with_nlp(text) if NLP_ENABLED else extract_skills_basic(text)
 
 def evaluate_answer_with_nlp(question, answer, expected_keywords):
-    """Evaluate an answer using NLP techniques"""
     if not answer.strip():
         return {"score": 0, "feedback": "No answer provided.", "missing_concepts": expected_keywords}
     
-    # Basic keyword matching if NLP is not enabled
     if not NLP_ENABLED:
         keyword_count = sum(1 for keyword in expected_keywords if keyword.lower() in answer.lower())
         score = min(keyword_count / len(expected_keywords), 1.0) * 100
         missing = [k for k in expected_keywords if k.lower() not in answer.lower()]
         return {"score": score, "feedback": "Basic keyword matching applied.", "missing_concepts": missing}
     
-    # Advanced NLP processing
     processed_answer = preprocess_text(answer)
     processed_keywords = [preprocess_text(kw) for kw in expected_keywords]
-    
-    # Count matched keywords
     keyword_count = sum(1 for kw in processed_keywords if kw in processed_answer)
-    
-    # Calculate score based on keyword coverage
     score = min(keyword_count / len(expected_keywords), 1.0) * 100
-    
-    # Identify missing concepts
     missing = [kw for kw in expected_keywords if preprocess_text(kw) not in processed_answer]
     
-    # Generate feedback based on score
     feedback = get_feedback_message(score)
     if missing:
         feedback += f" Consider mentioning: {', '.join(missing[:3])}."
     
-    # For technical depth analysis, check sentence length and variation
-    sentences = answer.split('.')
-    avg_sentence_length = sum(len(s.split()) for s in sentences if s.strip()) / max(1, len([s for s in sentences if s.strip()]))
-    
-    # Analyze technical depth based on answer length and keyword density
-    if len(answer.split()) > 100 and score > 70:
-        feedback += " Your answer shows good technical depth."
-    elif len(answer.split()) < 30 and score < 70:
-        feedback += " Consider providing a more detailed explanation."
-    
-    # Check for explanation patterns
-    explanation_patterns = ["because", "therefore", "means that", "this is why", "which is"]
-    has_explanations = any(pattern in answer.lower() for pattern in explanation_patterns)
-    
-    if has_explanations and score > 50:
-        feedback += " Your explanations help demonstrate understanding."
-    elif not has_explanations and score > 50:
-        feedback += " Consider explaining 'why' in addition to 'what'."
-    
-    return {
-        "score": score, 
-        "feedback": feedback, 
-        "missing_concepts": missing
-    }
+    return {"score": score, "feedback": feedback, "missing_concepts": missing}
 
 def extract_text_from_pdf(pdf_file):
     try:
@@ -420,63 +285,37 @@ def extract_text_from_docx(docx_file):
         return ""
 
 def generate_technical_questions(skills, max_questions=7):
-    """Generate questions with improved randomization and more questions per skill"""
     all_possible_questions = []
-    
-    # Get all skills from the user's profile
     all_skills = [skill for category, skill_list in skills.items() for skill in skill_list]
-    
-    # Count frequency of each skill
     skill_frequency = {skill: all_skills.count(skill) for skill in set(all_skills)}
-    
-    # Sort skills by frequency (most frequent first)
     sorted_skills = sorted(skill_frequency.keys(), key=lambda x: skill_frequency[x], reverse=True)
     
-    # Aim to select a balanced set of questions
-    target_questions_per_skill = max(1, max_questions // len(sorted_skills)) if sorted_skills else 0
-    remaining_slots = max_questions
-    
-    # Collect questions for each skill
     for skill in sorted_skills:
         if skill in TECHNICAL_QUESTIONS:
-            # Get all questions for this skill and shuffle them
-            skill_questions = TECHNICAL_QUESTIONS[skill].copy()
-            random.shuffle(skill_questions)
-            
-            # Take up to target number of questions per skill
-            num_to_take = min(len(skill_questions), target_questions_per_skill, remaining_slots)
-            all_possible_questions.extend(skill_questions[:num_to_take])
-            remaining_slots -= num_to_take
+            all_possible_questions.extend(TECHNICAL_QUESTIONS[skill])
     
-    # If we still have slots available, add random questions from any skill
-    if remaining_slots > 0 and sorted_skills:
-        additional_questions = []
-        for skill in sorted_skills:
-            if skill in TECHNICAL_QUESTIONS:
-                # Get questions we haven't used yet
-                used_questions = [q["question"] for q in all_possible_questions]
-                unused_questions = [q for q in TECHNICAL_QUESTIONS[skill] 
-                                  if q["question"] not in used_questions]
-                additional_questions.extend(unused_questions)
-        
-        # Shuffle and take what we need
-        random.shuffle(additional_questions)
-        all_possible_questions.extend(additional_questions[:remaining_slots])
-        remaining_slots -= min(len(additional_questions), remaining_slots)
-    
-    # Add generic questions if we still need more
-    if remaining_slots > 0:
+    if len(all_possible_questions) < max_questions:
         random.shuffle(GENERIC_QUESTIONS)
-        
-        # Get questions we haven't used yet
-        used_questions = [q["question"] for q in all_possible_questions]
-        unused_generic = [q for q in GENERIC_QUESTIONS if q["question"] not in used_questions]
-        
-        all_possible_questions.extend(unused_generic[:remaining_slots])
+        all_possible_questions.extend(GENERIC_QUESTIONS)
     
-    # Final shuffle and limit to max_questions
-    random.shuffle(all_possible_questions)
-    return all_possible_questions[:max_questions]
+    unique_questions = []
+    question_texts = set()
+    for q in all_possible_questions:
+        if q["question"] not in question_texts:
+            unique_questions.append(q)
+            question_texts.add(q["question"])
+            if len(unique_questions) >= max_questions:
+                break
+    
+    if len(unique_questions) < max_questions:
+        for q in GENERIC_QUESTIONS:
+            if q["question"] not in question_texts:
+                unique_questions.append(q)
+                question_texts.add(q["question"])
+                if len(unique_questions) >= max_questions:
+                    break
+    
+    return unique_questions[:max_questions]
 
 def get_download_link(text, filename, label="Download"):
     b64 = base64.b64encode(text.encode()).decode()
@@ -556,7 +395,7 @@ def generate_interview_summary(candidate_name, interview_date, avg_score, rating
     summary.append("\n## Skills Profile")
     for category, skill_list in skills.items():
         summary.append(f"**{category.capitalize()}:** {', '.join(skill_list)}")
-summary.append("\n## Question Analysis")
+    summary.append("\n## Question Analysis")
     for i, q in enumerate(questions):
         if q['question'] in evaluations:
             data = evaluations[q['question']]
@@ -732,86 +571,112 @@ def process_user_input(user_input):
                 add_message("assistant", "I'm ready whenever you are. Type 'start interview' to begin.")
     
     elif st.session_state.bot_state == "interview":
-        current_question = st.session_state.questions[st.session_state.current_question_index]
-        evaluation = evaluate_answer_with_nlp(current_question["question"], user_input, current_question["expected_keywords"])
+        current_index = st.session_state.current_question_index
+        current_question = st.session_state.questions[current_index]
+        evaluation = evaluate_answer_with_nlp(
+            question=current_question['question'],
+            answer=user_input,
+            expected_keywords=current_question['expected_keywords']
+        )
+        st.session_state.evaluations[current_question['question']] = {"answer": user_input, "evaluation": evaluation}
         
-        st.session_state.evaluations[current_question["question"]] = {
-            "answer": user_input,
-            "evaluation": evaluation
-        }
+        score = evaluation.get('score', 0)
+        feedback_message = get_feedback_message(score)
+        feedback = f"{feedback_message}\n\n**Score:** {score}/100\n\n{evaluation.get('feedback', '')}"
+        missing = evaluation.get('missing_concepts', [])
+        if missing:
+            feedback += "\n\n**Areas to improve:**\n" + "\n".join(f"- {concept}" for concept in missing)
+        add_message("assistant", feedback)
         
-        feedback = evaluation["feedback"]
-        missing_concepts = evaluation.get("missing_concepts", [])
-        missing_text = ""
-        if missing_concepts:
-            missing_text = "\n\nConsider including these concepts in your answer: " + ", ".join(missing_concepts[:3])
-            if len(missing_concepts) > 3:
-                missing_text += ", and others."
+        current_index += 1
+        st.session_state.current_question_index = current_index
         
-        score = evaluation.get("score", 0)
-        score_message = f"\n\n**Score:** {score:.1f}/100"
-        
-        st.session_state.current_question_index += 1
-        
-        if st.session_state.current_question_index < len(st.session_state.questions):
-            next_question = st.session_state.questions[st.session_state.current_question_index]
+        if current_index < len(st.session_state.questions):
+            next_question = st.session_state.questions[current_index]["question"]
             transition = random.choice(QUESTION_TRANSITIONS)
-            response = f"{feedback}{missing_text}{score_message}\n\n{transition}\n\n**Question {st.session_state.current_question_index + 1}:** {next_question['question']}"
-            add_message("assistant", response)
+            add_message("assistant", f"{transition}\n\n**Question {current_index + 1}:** {next_question}")
         else:
-            st.session_state.interview_complete = True
             st.session_state.bot_state = "complete"
-            
+            st.session_state.interview_complete = True
             evaluations = st.session_state.evaluations
             total_score = sum(data["evaluation"].get("score", 0) for data in evaluations.values())
             avg_score = total_score / len(evaluations) if evaluations else 0
-            
-            if avg_score >= 85:
-                rating = "Excellent"
-                message = "Your technical knowledge is impressive! You demonstrated a deep understanding of the concepts."
-            elif avg_score >= 70:
-                rating = "Good"
-                message = "You showed good technical knowledge. With a bit more practice, you'll excel in interviews."
-            elif avg_score >= 50:
-                rating = "Average"
-                message = "You have a decent foundation, but should work on strengthening your technical knowledge."
-            else:
-                rating = "Needs Improvement"
-                message = "You should focus on building a stronger technical foundation before your interviews."
-                
-            summary = generate_interview_summary(
-                st.session_state.candidate_name or "Candidate", 
-                st.session_state.interview_date,
-                avg_score,
-                rating,
-                st.session_state.skills,
-                evaluations,
-                st.session_state.questions
-            )
-                
-            response = f"{feedback}{missing_text}{score_message}\n\n**Interview Complete!**\n\nYour overall score is **{avg_score:.1f}/100** ({rating}).\n\n{message}\n\nHere's a summary of your performance:\n\n```\n{summary}\n```"
-            add_message("assistant", response)
-            
+            rating = "Excellent" if avg_score >= 85 else "Good" if avg_score >= 70 else "Average" if avg_score >= 50 else "Needs Improvement"
+            summary = f"""
+            ## Interview Complete!
+            Thank you for completing the technical interview practice session. Here's your performance summary:
+            **Overall Score:** {avg_score:.1f}/100
+            **Rating:** {rating}
+            Would you like to:
+            1. Review your answers and feedback
+            2. Export your results as PDF
+            3. Generate a detailed interview summary
+            4. Start a new interview
+            Just let me know what you'd like to do next!
+            """
+            add_message("assistant", summary)
+    
+    elif st.session_state.bot_state == "complete":
+        if "review" in user_input.lower() or "answers" in user_input.lower():
+            review = "## Your Interview Responses and Feedback\n\n"
+            for i, q in enumerate(st.session_state.questions):
+                if q['question'] in st.session_state.evaluations:
+                    data = st.session_state.evaluations[q['question']]
+                    evaluation = data["evaluation"]
+                    review += f"### Question {i+1}: {q['question']}\n"
+                    review += f"**Your answer:** {data['answer']}\n\n"
+                    review += f"**Score:** {evaluation.get('score', 0)}/100\n"
+                    review += f"**Feedback:** {evaluation.get('feedback', 'No feedback available')}\n\n"
+                    missing = evaluation.get('missing_concepts', [])
+                    if missing:
+                        review += "**Areas for improvement:**\n" + "\n".join(f"- {concept}" for concept in missing)
+                    review += "\n---\n\n"
+            add_message("assistant", review)
+        
+        elif "pdf" in user_input.lower() or "export" in user_input.lower():
             try:
+                evaluations = st.session_state.evaluations
+                total_score = sum(data["evaluation"].get("score", 0) for data in evaluations.values())
+                avg_score = total_score / len(evaluations) if evaluations else 0
+                rating = "Excellent" if avg_score >= 85 else "Good" if avg_score >= 70 else "Average" if avg_score >= 50 else "Needs Improvement"
                 pdf_path = export_results_as_pdf(
                     st.session_state.candidate_name or "Candidate",
                     st.session_state.interview_date,
                     avg_score,
                     rating,
                     st.session_state.skills,
-                    evaluations,
+                    st.session_state.evaluations,
                     st.session_state.questions
                 )
                 with open(pdf_path, "rb") as f:
                     pdf_bytes = f.read()
                 pdf_b64 = base64.b64encode(pdf_bytes).decode()
-                href = f'<a href="data:application/pdf;base64,{pdf_b64}" download="interview_results.pdf">Download PDF Report</a>'
-                st.markdown(href, unsafe_allow_html=True)
+                pdf_link = f'<a href="data:application/pdf;base64,{pdf_b64}" download="interview_results.pdf">Download Interview Results (PDF)</a>'
+                add_message("assistant", f"Your interview results are ready! {pdf_link}")
             except Exception as e:
-                st.error(f"Error generating PDF: {e}")
-    
-    elif st.session_state.bot_state == "complete":
-        if "new interview" in user_input.lower() or "start over" in user_input.lower() or "again" in user_input.lower():
+                add_message("assistant", f"Sorry, there was an error generating the PDF: {str(e)}")
+        
+        elif "summary" in user_input.lower() or "detailed" in user_input.lower():
+            evaluations = st.session_state.evaluations
+            total_score = sum(data["evaluation"].get("score", 0) for data in evaluations.values())
+            avg_score = total_score / len(evaluations) if evaluations else 0
+            rating = "Excellent" if avg_score >= 85 else "Good" if avg_score >= 70 else "Average" if avg_score >= 50 else "Needs Improvement"
+            summary = generate_interview_summary(
+                st.session_state.candidate_name or "Candidate",
+                st.session_state.interview_date,
+                avg_score,
+                rating,
+                st.session_state.skills,
+                st.session_state.evaluations,
+                st.session_state.questions
+            )
+            add_message("assistant", summary)
+            summary_text = summary.encode()
+            summary_b64 = base64.b64encode(summary_text).decode()
+            summary_link = f'<a href="data:text/markdown;base64,{summary_b64}" download="interview_summary.md">Download Summary (Markdown)</a>'
+            add_message("assistant", f"You can also download this summary: {summary_link}")
+        
+        elif "new" in user_input.lower() or "start" in user_input.lower() or "again" in user_input.lower():
             st.session_state.resume_text = ""
             st.session_state.skills = {}
             st.session_state.questions = []
@@ -819,30 +684,36 @@ def process_user_input(user_input):
             st.session_state.evaluations = {}
             st.session_state.interview_complete = False
             st.session_state.bot_state = "wait_for_resume"
-            add_message("assistant", random.choice(WELCOME_MESSAGES) + " " + random.choice(RESUME_PROMPTS))
+            st.session_state.chat_messages = [{"role": "assistant", "content": random.choice(WELCOME_MESSAGES) + " " + random.choice(RESUME_PROMPTS)}]
+            st.session_state.debug_skills = []
+            st.session_state.raw_resume_text = ""
+            st.rerun()
         else:
-            add_message("assistant", "The interview is complete! If you'd like to start a new interview, type 'new interview' or use the button in the sidebar.")
+            add_message("assistant", """
+            What would you like to do next?
+            1. **Review your answers and feedback**
+            2. **Export your results as PDF**
+            3. **Generate a detailed interview summary**
+            4. **Start a new interview**
+            Just let me know what option you prefer.
+            """)
 
-if uploaded_file:
+if uploaded_file is not None and not st.session_state.resume_text:
     file_extension = uploaded_file.name.split(".")[-1].lower()
-    
     if file_extension == "pdf":
-        with st.spinner("Processing PDF..."):
-            resume_text = extract_text_from_pdf(uploaded_file)
+        resume_text = extract_text_from_pdf(uploaded_file)
     elif file_extension == "docx":
-        with st.spinner("Processing DOCX..."):
-            resume_text = extract_text_from_docx(uploaded_file)
+        resume_text = extract_text_from_docx(uploaded_file)
     else:
-        st.error("Unsupported file format")
         resume_text = ""
+        st.error("Unsupported file format. Please upload a PDF or DOCX file.")
     
-    if resume_text and st.session_state.bot_state == "wait_for_resume":
+    if resume_text:
         st.session_state.resume_text = resume_text
         st.session_state.bot_state = "analyzing_resume"
-        
-        add_message("user", "I've uploaded my resume.")
-        add_message("assistant", "Thanks for uploading your resume! I'm analyzing it to identify your technical skills...")
-        
+        st.session_state.chat_messages = [
+            {"role": "assistant", "content": "Thanks for uploading your resume! I'm analyzing it to identify your technical skills..."}
+        ]
         skills = extract_skills(resume_text)
         if not skills:
             add_message("assistant", "I couldn't identify specific technical skills from your resume. Let's add some manually. What are your top technical skills? (e.g., Python, Java, AWS)")
@@ -850,6 +721,9 @@ if uploaded_file:
         else:
             st.session_state.skills = skills
             skill_message = random.choice(SKILL_MESSAGES) + "\n\n" + format_skills_message(skills)
+            if st.session_state.debug_skills:
+                skill_message += "\n\n**Debug Info:**\n" + "\n".join(st.session_state.debug_skills)
+            skill_message += f"\n\n**Raw Resume Text (first 200 chars):** {st.session_state.raw_resume_text[:200]}..."
             skill_message += "\n\nAre these skills accurate? You can add more skills if needed, or type 'start interview' when you're ready."
             add_message("assistant", skill_message)
             st.session_state.bot_state = "confirm_skills"
@@ -858,7 +732,43 @@ with chat_container:
     for message in st.session_state.chat_messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
-
-    if user_input := st.chat_input("Type here...", key="chat_input"):
+    
+    if user_input := st.chat_input("Type here"):
         process_user_input(user_input)
         st.rerun()
+
+if st.session_state.interview_complete:
+    with st.sidebar:
+        st.subheader("Export Results")
+        evaluations = st.session_state.evaluations
+        total_score = sum(data["evaluation"].get("score", 0) for data in evaluations.values())
+        avg_score = total_score / len(evaluations) if evaluations else 0
+        rating = "Excellent" if avg_score >= 85 else "Good" if avg_score >= 70 else "Average" if avg_score >= 50 else "Needs Improvement"
+        summary = generate_interview_summary(
+            st.session_state.candidate_name or "Candidate",
+            st.session_state.interview_date,
+            avg_score,
+            rating,
+            st.session_state.skills,
+            st.session_state.evaluations,
+            st.session_state.questions
+        )
+        st.markdown(get_download_link(summary, "interview_summary.md", "Download Summary (Markdown)"), unsafe_allow_html=True)
+        
+        if st.button("Generate PDF"):
+            try:
+                pdf_path = export_results_as_pdf(
+                    st.session_state.candidate_name or "Candidate",
+                    st.session_state.interview_date,
+                    avg_score,
+                    rating,
+                    st.session_state.skills,
+                    st.session_state.evaluations,
+                    st.session_state.questions
+                )
+                with open(pdf_path, "rb") as f:
+                    pdf_bytes = f.read()
+                pdf_b64 = base64.b64encode(pdf_bytes).decode()
+                st.markdown(f'<a href="data:application/pdf;base64,{pdf_b64}" download="interview_results.pdf">Download Interview Results (PDF)</a>', unsafe_allow_html=True)
+            except Exception as e:
+                st.error(f"Error generating PDF: {str(e)}")
