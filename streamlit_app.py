@@ -52,8 +52,8 @@ except Exception as e:
     auth = None
 
 # Email configuration (loaded from Streamlit secrets)
-EMAIL_SENDER = st.secrets.get("email_sender", "your-email@gmail.com")
-EMAIL_PASSWORD = st.secrets.get("email_password", "your-app-password")
+EMAIL_SENDER = "projecttestingsubhash@gmail.com"
+EMAIL_PASSWORD = "zgwynxksfnwzusyk"
 SMTP_SERVER = st.secrets.get("smtp_server", "smtp.gmail.com")
 SMTP_PORT = st.secrets.get("smtp_port", 587)
 
