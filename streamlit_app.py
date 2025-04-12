@@ -47,7 +47,6 @@ COMMON_SKILLS = {
     'soft_skills': ['communication', 'leadership', 'teamwork', 'problem solving', 'time management'],
 }
 
-# Expanded technical questions for each skill
 TECHNICAL_QUESTIONS = {
     'python': [
         {"question": "Explain how you would implement a decorator in Python.", 
@@ -56,20 +55,16 @@ TECHNICAL_QUESTIONS = {
          "expected_keywords": ["try", "except", "finally", "raise", "error", "handling"]},
         {"question": "Describe the difference between a list and a tuple in Python.", 
          "expected_keywords": ["mutable", "immutable", "list", "tuple", "ordered", "elements"]},
-        {"question": "How do you handle concurrent operations in Python?",
-         "expected_keywords": ["threading", "multiprocessing", "GIL", "asyncio", "concurrent", "futures"]},
-        {"question": "Explain Python's memory management and garbage collection.",
-         "expected_keywords": ["reference counting", "garbage collector", "memory", "objects", "allocation", "cycle"]},
-        {"question": "What are Python generators and how do they work?",
-         "expected_keywords": ["yield", "iterator", "memory", "efficient", "lazy", "next"]},
-        {"question": "How would you optimize a slow Python script?",
-         "expected_keywords": ["profiling", "algorithms", "data structures", "cython", "numpy", "vectorization"]},
-        {"question": "Explain the difference between shallow copy and deep copy in Python.",
-         "expected_keywords": ["copy", "deepcopy", "reference", "nested", "objects", "mutable"]},
-        {"question": "How do you use context managers in Python?",
-         "expected_keywords": ["with", "context", "enter", "exit", "resources", "cleanup"]},
-        {"question": "Describe Python's approach to OOP principles.",
-         "expected_keywords": ["class", "inheritance", "polymorphism", "encapsulation", "self", "method"]}
+        {"question": "What are generators in Python and how do they differ from regular functions?", 
+         "expected_keywords": ["generator", "yield", "iterator", "memory", "lazy", "next"]},
+        {"question": "Explain the Global Interpreter Lock (GIL) in Python.", 
+         "expected_keywords": ["GIL", "thread", "multithreading", "lock", "CPython", "performance"]},
+        {"question": "How do you manage memory in Python?", 
+         "expected_keywords": ["garbage collection", "reference counting", "memory", "del", "objects", "heap"]},
+        {"question": "What is the difference between deep copy and shallow copy?", 
+         "expected_keywords": ["deep copy", "shallow copy", "copy", "reference", "nested", "object"]},
+        {"question": "Explain list comprehensions and their advantages.", 
+         "expected_keywords": ["list comprehension", "loop", "concise", "performance", "syntax", "filter"]},
     ],
     'java': [
         {"question": "Explain the concept of inheritance in Java.", 
@@ -78,20 +73,16 @@ TECHNICAL_QUESTIONS = {
          "expected_keywords": ["try", "catch", "finally", "throw", "throws", "exception"]},
         {"question": "What is the difference between an interface and an abstract class in Java?", 
          "expected_keywords": ["implement", "extend", "methods", "abstract", "interface", "multiple"]},
-        {"question": "Explain Java's memory management and garbage collection.",
-         "expected_keywords": ["heap", "stack", "JVM", "garbage collection", "memory", "objects"]},
-        {"question": "How do you handle concurrency in Java?",
-         "expected_keywords": ["synchronized", "thread", "lock", "atomic", "concurrent", "volatile"]},
-        {"question": "What are Java streams and how do you use them?",
-         "expected_keywords": ["stream", "filter", "map", "collect", "functional", "lambda"]},
-        {"question": "Explain the principle of 'Write Once, Run Anywhere' in Java.",
-         "expected_keywords": ["JVM", "bytecode", "platform", "independent", "compile", "interpret"]},
-        {"question": "How do annotations work in Java?",
-         "expected_keywords": ["annotation", "metadata", "runtime", "compiler", "reflection", "processor"]},
-        {"question": "What are the different types of references in Java?",
-         "expected_keywords": ["strong", "weak", "soft", "phantom", "garbage", "collection"]},
-        {"question": "Explain Java generics and their benefits.",
-         "expected_keywords": ["generics", "type", "safety", "compile", "erasure", "collections"]}
+        {"question": "Describe how the JVM manages memory.", 
+         "expected_keywords": ["JVM", "heap", "stack", "garbage collection", "memory", "allocation"]},
+        {"question": "What are Java streams and how are they used?", 
+         "expected_keywords": ["stream", "lambda", "functional", "pipeline", "filter", "map"]},
+        {"question": "Explain the concept of multithreading in Java.", 
+         "expected_keywords": ["thread", "runnable", "synchronize", "concurrency", "lock", "executor"]},
+        {"question": "What is the difference between equals() and == in Java?", 
+         "expected_keywords": ["equals", "==", "reference", "value", "comparison", "object"]},
+        {"question": "How does the Java Collections Framework work?", 
+         "expected_keywords": ["collections", "list", "set", "map", "arraylist", "hashmap"]},
     ],
     'javascript': [
         {"question": "Explain closures in JavaScript.", 
@@ -100,20 +91,16 @@ TECHNICAL_QUESTIONS = {
          "expected_keywords": ["promise", "async", "await", "callback", "then", "event loop"]},
         {"question": "What's the difference between var, let, and const in JavaScript?", 
          "expected_keywords": ["scope", "hoisting", "reassign", "block", "function", "declaration"]},
-        {"question": "Explain prototypal inheritance in JavaScript.",
-         "expected_keywords": ["prototype", "inheritance", "chain", "object", "__proto__", "constructor"]},
-        {"question": "How does the 'this' keyword work in JavaScript?",
-         "expected_keywords": ["context", "bind", "call", "apply", "arrow", "function"]},
-        {"question": "What are JavaScript modules and how do you use them?",
-         "expected_keywords": ["import", "export", "module", "ESM", "CommonJS", "bundler"]},
-        {"question": "Explain event bubbling and capturing in JavaScript.",
-         "expected_keywords": ["bubbling", "capturing", "propagation", "target", "currentTarget", "stopPropagation"]},
-        {"question": "How does JavaScript's event loop work?",
-         "expected_keywords": ["stack", "queue", "event loop", "microtask", "macrotask", "asynchronous"]},
-        {"question": "What are Web APIs and how do they interact with JavaScript?",
-         "expected_keywords": ["DOM", "fetch", "localStorage", "browser", "API", "asynchronous"]},
-        {"question": "Describe JavaScript's memory management and garbage collection.",
-         "expected_keywords": ["garbage collection", "memory leak", "reference", "closure", "heap", "mark-and-sweep"]}
+        {"question": "What is the event loop in JavaScript?", 
+         "expected_keywords": ["event loop", "call stack", "queue", "asynchronous", "browser", "execution"]},
+        {"question": "Explain the concept of prototypal inheritance.", 
+         "expected_keywords": ["prototype", "inheritance", "object", "chain", "__proto__", "constructor"]},
+        {"question": "What are arrow functions and how do they differ from regular functions?", 
+         "expected_keywords": ["arrow function", "this", "binding", "syntax", "lexical", "concise"]},
+        {"question": "How do you handle errors in JavaScript?", 
+         "expected_keywords": ["try", "catch", "throw", "error", "promise", "async"]},
+        {"question": "What is the difference between null and undefined?", 
+         "expected_keywords": ["null", "undefined", "value", "absence", "type", "comparison"]},
     ],
     'sql': [
         {"question": "Explain the difference between INNER JOIN and LEFT JOIN.", 
@@ -122,20 +109,16 @@ TECHNICAL_QUESTIONS = {
          "expected_keywords": ["index", "execution plan", "query", "optimize", "performance", "analyze"]},
         {"question": "What is database normalization?", 
          "expected_keywords": ["normal form", "redundancy", "dependency", "relation", "table", "normalize"]},
-        {"question": "Explain the concept of transactions in SQL.",
-         "expected_keywords": ["ACID", "commit", "rollback", "transaction", "atomic", "consistency"]},
-        {"question": "How do you handle deadlocks in a database?",
-         "expected_keywords": ["deadlock", "transaction", "lock", "timeout", "detection", "prevention"]},
-        {"question": "What are indexes and how do they improve query performance?",
-         "expected_keywords": ["index", "b-tree", "search", "performance", "clustered", "non-clustered"]},
-        {"question": "Explain the difference between DELETE, TRUNCATE, and DROP.",
-         "expected_keywords": ["delete", "truncate", "drop", "table", "record", "structure"]},
-        {"question": "How do you implement data partitioning in SQL?",
-         "expected_keywords": ["partition", "shard", "horizontal", "vertical", "table", "performance"]},
-        {"question": "What are stored procedures and triggers?",
-         "expected_keywords": ["stored procedure", "trigger", "function", "execute", "event", "automate"]},
-        {"question": "Explain subqueries and their types in SQL.",
-         "expected_keywords": ["subquery", "nested", "correlated", "uncorrelated", "performance", "optimization"]}
+        {"question": "What are indexes and how do they impact performance?", 
+         "expected_keywords": ["index", "performance", "lookup", "clustered", "non-clustered", "query"]},
+        {"question": "Explain the ACID properties in databases.", 
+         "expected_keywords": ["ACID", "atomicity", "consistency", "isolation", "durability", "transaction"]},
+        {"question": "What is a stored procedure and when would you use one?", 
+         "expected_keywords": ["stored procedure", "database", "execute", "logic", "performance", "security"]},
+        {"question": "How do you prevent SQL injection attacks?", 
+         "expected_keywords": ["SQL injection", "prepared statement", "parameterized", "sanitize", "escape", "security"]},
+        {"question": "What is the difference between a view and a table?", 
+         "expected_keywords": ["view", "table", "virtual", "query", "stored", "data"]},
     ],
     'react': [
         {"question": "Explain the component lifecycle in React.", 
@@ -144,20 +127,16 @@ TECHNICAL_QUESTIONS = {
          "expected_keywords": ["useState", "useReducer", "state", "props", "context", "Redux"]},
         {"question": "What are hooks in React and why were they introduced?", 
          "expected_keywords": ["hooks", "functional", "state", "effect", "rules", "useState"]},
-        {"question": "Explain the concept of Virtual DOM in React.",
-         "expected_keywords": ["virtual DOM", "reconciliation", "diffing", "rendering", "performance", "update"]},
-        {"question": "How do you handle side effects in React components?",
-         "expected_keywords": ["useEffect", "dependency array", "cleanup", "lifecycle", "async", "fetch"]},
-        {"question": "What are Higher-Order Components (HOCs) in React?",
-         "expected_keywords": ["HOC", "component", "wrapping", "reuse", "props", "enhance"]},
-        {"question": "Explain the Context API and when you would use it.",
-         "expected_keywords": ["context", "provider", "consumer", "useContext", "global", "state"]},
-        {"question": "How do you optimize performance in React applications?",
-         "expected_keywords": ["memo", "useMemo", "useCallback", "lazy loading", "code splitting", "performance"]},
-        {"question": "What are React portals and when would you use them?",
-         "expected_keywords": ["portal", "DOM", "render", "modal", "overlay", "parent"]},
-        {"question": "Explain the difference between controlled and uncontrolled components.",
-         "expected_keywords": ["controlled", "uncontrolled", "input", "form", "state", "ref"]}
+        {"question": "What is the virtual DOM and how does it work?", 
+         "expected_keywords": ["virtual DOM", "reconciliation", "diffing", "render", "performance", "update"]},
+        {"question": "How do you optimize performance in a React application?", 
+         "expected_keywords": ["memo", "useCallback", "useMemo", "lazy", "performance", "render"]},
+        {"question": "What is the difference between controlled and uncontrolled components?", 
+         "expected_keywords": ["controlled", "uncontrolled", "state", "form", "input", "manage"]},
+        {"question": "How does React Router work?", 
+         "expected_keywords": ["router", "route", "navigation", "component", "path", "history"]},
+        {"question": "Explain the concept of higher-order components.", 
+         "expected_keywords": ["higher-order", "component", "reuse", "props", "wrapping", "logic"]},
     ],
     'aws': [
         {"question": "Explain the difference between EC2 and Lambda.", 
@@ -166,24 +145,19 @@ TECHNICAL_QUESTIONS = {
          "expected_keywords": ["IAM", "security group", "encryption", "access", "policy", "role"]},
         {"question": "Describe the AWS services you've worked with.", 
          "expected_keywords": ["S3", "EC2", "Lambda", "RDS", "CloudFront", "DynamoDB"]},
-        {"question": "What is Auto Scaling in AWS and how does it work?",
-         "expected_keywords": ["scaling", "EC2", "group", "load", "policy", "metric"]},
-        {"question": "Explain AWS VPC and its components.",
-         "expected_keywords": ["VPC", "subnet", "route table", "internet gateway", "NACL", "security group"]},
-        {"question": "How do you deploy applications in AWS?",
-         "expected_keywords": ["CodeDeploy", "Elastic Beanstalk", "CloudFormation", "pipeline", "CI/CD", "deployment"]},
-        {"question": "What are AWS S3 storage classes and when would you use each?",
-         "expected_keywords": ["standard", "infrequent access", "glacier", "cost", "retrieval", "durability"]},
-        {"question": "Explain AWS CloudFormation and Infrastructure as Code.",
-         "expected_keywords": ["template", "stack", "resource", "IaC", "provision", "automation"]},
-        {"question": "How do you monitor applications in AWS?",
-         "expected_keywords": ["CloudWatch", "logging", "metrics", "alarm", "event", "dashboard"]},
-        {"question": "What is AWS Identity and Access Management (IAM)?",
-         "expected_keywords": ["IAM", "user", "role", "policy", "permission", "authentication"]}
+        {"question": "What is VPC and why is it used?", 
+         "expected_keywords": ["VPC", "network", "subnet", "isolation", "security", "private"]},
+        {"question": "How does auto-scaling work in AWS?", 
+         "expected_keywords": ["auto-scaling", "EC2", "load balancer", "group", "policy", "traffic"]},
+        {"question": "Explain the difference between S3 and EBS.", 
+         "expected_keywords": ["S3", "EBS", "storage", "block", "object", "durability"]},
+        {"question": "What is CloudFormation and how is it used?", 
+         "expected_keywords": ["CloudFormation", "template", "infrastructure", "stack", "provision", "YAML"]},
+        {"question": "How do you monitor AWS resources?", 
+         "expected_keywords": ["CloudWatch", "metrics", "logs", "alarms", "monitoring", "dashboard"]},
     ],
 }
 
-# Expanded generic questions
 GENERIC_QUESTIONS = [
     {"question": "Tell me about a challenging project you worked on and how you overcame obstacles.", 
      "expected_keywords": ["challenge", "project", "solution", "overcome", "team", "result"]},
@@ -193,22 +167,10 @@ GENERIC_QUESTIONS = [
      "expected_keywords": ["agile", "scrum", "sprint", "kanban", "standup", "retrospective"]},
     {"question": "How do you ensure code quality in your projects?", 
      "expected_keywords": ["testing", "review", "standards", "documentation", "refactoring", "clean"]},
-    {"question": "Describe a situation where you had to debug a complex issue. What was your approach?",
-     "expected_keywords": ["debug", "troubleshoot", "analyze", "problem", "solution", "methodology"]},
-    {"question": "How do you keep your technical skills up-to-date?",
-     "expected_keywords": ["learning", "courses", "practice", "community", "projects", "research"]},
-    {"question": "Tell me about a time when you had to make a technical decision with limited information.",
-     "expected_keywords": ["decision", "analysis", "risk", "information", "outcome", "process"]},
-    {"question": "How do you handle technical disagreements within a team?",
-     "expected_keywords": ["communication", "compromise", "discussion", "evidence", "respect", "resolution"]},
-    {"question": "Describe your approach to system design and architecture.",
-     "expected_keywords": ["scalability", "requirements", "tradeoffs", "design", "components", "architecture"]},
-    {"question": "How do you balance technical debt against delivering features?",
-     "expected_keywords": ["technical debt", "prioritize", "refactor", "balance", "quality", "delivery"]},
-    {"question": "Tell me about a time when you improved a process or system.",
-     "expected_keywords": ["improvement", "efficiency", "process", "impact", "measure", "implement"]},
-    {"question": "How do you approach documentation in your projects?",
-     "expected_keywords": ["documentation", "clarity", "audience", "purpose", "update", "importance"]}
+    {"question": "What strategies do you use to debug complex issues?", 
+     "expected_keywords": ["debug", "breakpoint", "log", "trace", "isolate", "tools"]},
+    {"question": "How do you handle conflicting priorities in a project?", 
+     "expected_keywords": ["prioritize", "communication", "stakeholder", "deadline", "trade-off", "plan"]},
 ]
 
 WELCOME_MESSAGES = [
@@ -308,7 +270,6 @@ def extract_skills_with_nlp(text):
         for skill in skill_list:
             aliases = SKILL_ALIASES.get(skill, [skill])
             for alias in aliases:
-                # Require exact match near context keyword
                 pattern = rf'{context_patterns}\s*[^.\n]*\b{re.escape(alias)}\b[^.\n]*'
                 matches = re.finditer(pattern, raw_text)
                 for match in matches:
@@ -318,7 +279,7 @@ def extract_skills_with_nlp(text):
             identified_skills[category] = list(found_skills)
     
     st.session_state.debug_skills = debug_matches
-    st.session_state.raw_resume_text = raw_text  # Store raw text for debugging
+    st.session_state.raw_resume_text = raw_text
     return identified_skills
 
 def extract_skills_basic(text):
@@ -347,42 +308,31 @@ def evaluate_answer_with_nlp(question, answer, expected_keywords):
     if not answer.strip():
         return {"score": 0, "feedback": "No answer provided.", "missing_concepts": expected_keywords}
     
-    # Basic keyword matching if NLP is not enabled
     if not NLP_ENABLED:
         keyword_count = sum(1 for keyword in expected_keywords if keyword.lower() in answer.lower())
         score = min(keyword_count / len(expected_keywords), 1.0) * 100
         missing = [k for k in expected_keywords if k.lower() not in answer.lower()]
         return {"score": score, "feedback": "Basic keyword matching applied.", "missing_concepts": missing}
     
-    # Advanced NLP processing
     processed_answer = preprocess_text(answer)
     processed_keywords = [preprocess_text(kw) for kw in expected_keywords]
     
-    # Count matched keywords
     keyword_count = sum(1 for kw in processed_keywords if kw in processed_answer)
-    
-    # Calculate score based on keyword coverage
     score = min(keyword_count / len(expected_keywords), 1.0) * 100
-    
-    # Identify missing concepts
     missing = [kw for kw in expected_keywords if preprocess_text(kw) not in processed_answer]
     
-    # Generate feedback based on score
     feedback = get_feedback_message(score)
     if missing:
         feedback += f" Consider mentioning: {', '.join(missing[:3])}."
     
-    # For technical depth analysis, check sentence length and variation
     sentences = answer.split('.')
     avg_sentence_length = sum(len(s.split()) for s in sentences if s.strip()) / max(1, len([s for s in sentences if s.strip()]))
     
-    # Analyze technical depth based on answer length and keyword density
     if len(answer.split()) > 100 and score > 70:
         feedback += " Your answer shows good technical depth."
     elif len(answer.split()) < 30 and score < 70:
         feedback += " Consider providing a more detailed explanation."
     
-    # Check for explanation patterns
     explanation_patterns = ["because", "therefore", "means that", "this is why", "which is"]
     has_explanations = any(pattern in answer.lower() for pattern in explanation_patterns)
     
@@ -420,63 +370,43 @@ def extract_text_from_docx(docx_file):
         return ""
 
 def generate_technical_questions(skills, max_questions=7):
-    """Generate questions with improved randomization and more questions per skill"""
     all_possible_questions = []
-    
-    # Get all skills from the user's profile
     all_skills = [skill for category, skill_list in skills.items() for skill in skill_list]
     
-    # Count frequency of each skill
-    skill_frequency = {skill: all_skills.count(skill) for skill in set(all_skills)}
-    
-    # Sort skills by frequency (most frequent first)
-    sorted_skills = sorted(skill_frequency.keys(), key=lambda x: skill_frequency[x], reverse=True)
-    
-    # Aim to select a balanced set of questions
-    target_questions_per_skill = max(1, max_questions // len(sorted_skills)) if sorted_skills else 0
-    remaining_slots = max_questions
-    
-    # Collect questions for each skill
-    for skill in sorted_skills:
+    # Collect all relevant technical questions for the candidate's skills
+    for skill in set(all_skills):
         if skill in TECHNICAL_QUESTIONS:
-            # Get all questions for this skill and shuffle them
+            # Shuffle the questions for this skill to ensure randomness
             skill_questions = TECHNICAL_QUESTIONS[skill].copy()
             random.shuffle(skill_questions)
-            
-            # Take up to target number of questions per skill
-            num_to_take = min(len(skill_questions), target_questions_per_skill, remaining_slots)
-            all_possible_questions.extend(skill_questions[:num_to_take])
-            remaining_slots -= num_to_take
+            all_possible_questions.extend(skill_questions)
     
-    # If we still have slots available, add random questions from any skill
-    if remaining_slots > 0 and sorted_skills:
-        additional_questions = []
-        for skill in sorted_skills:
-            if skill in TECHNICAL_QUESTIONS:
-                # Get questions we haven't used yet
-                used_questions = [q["question"] for q in all_possible_questions]
-                unused_questions = [q for q in TECHNICAL_QUESTIONS[skill] 
-                                  if q["question"] not in used_questions]
-                additional_questions.extend(unused_questions)
-        
-        # Shuffle and take what we need
-        random.shuffle(additional_questions)
-        all_possible_questions.extend(additional_questions[:remaining_slots])
-        remaining_slots -= min(len(additional_questions), remaining_slots)
-    
-    # Add generic questions if we still need more
-    if remaining_slots > 0:
-        random.shuffle(GENERIC_QUESTIONS)
-        
-        # Get questions we haven't used yet
-        used_questions = [q["question"] for q in all_possible_questions]
-        unused_generic = [q for q in GENERIC_QUESTIONS if q["question"] not in used_questions]
-        
-        all_possible_questions.extend(unused_generic[:remaining_slots])
-    
-    # Final shuffle and limit to max_questions
+    # Shuffle all collected questions to mix skills
     random.shuffle(all_possible_questions)
-    return all_possible_questions[:max_questions]
+    
+    # Select up to max_questions, ensuring unique questions
+    unique_questions = []
+    question_texts = set()
+    for q in all_possible_questions:
+        if q["question"] not in question_texts:
+            unique_questions.append(q)
+            question_texts.add(q["question"])
+            if len(unique_questions) >= max_questions:
+                break
+    
+    # If we don't have enough questions, add generic ones
+    if len(unique_questions) < max_questions:
+        generic = GENERIC_QUESTIONS.copy()
+        random.shuffle(generic)
+        for q in generic:
+            if q["question"] not in question_texts:
+                unique_questions.append(q)
+                question_texts.add(q["question"])
+                if len(unique_questions) >= max_questions:
+                    break
+    
+    # Ensure we return exactly max_questions (or fewer if we run out)
+    return unique_questions[:max_questions]
 
 def get_download_link(text, filename, label="Download"):
     b64 = base64.b64encode(text.encode()).decode()
@@ -555,8 +485,8 @@ def generate_interview_summary(candidate_name, interview_date, avg_score, rating
     summary.append(f"**Rating:** {rating}")
     summary.append("\n## Skills Profile")
     for category, skill_list in skills.items():
-        summary.append(f"**{category.capitalize()}:** {', '.join(skill_list)}")
-summary.append("\n## Question Analysis")
+        summary.append(f"**{category.capitalize():** {', '.join(skill_list)}")
+    summary.append("\n## Question Analysis")
     for i, q in enumerate(questions):
         if q['question'] in evaluations:
             data = evaluations[q['question']]
@@ -616,7 +546,7 @@ def add_message(role, content):
 
 with st.sidebar:
     st.header("Interview Bot Settings")
-    if st.session_state.bot_state in ["wait_for_resume", "analyzing_resume"]:
+    if st.session_state.bot_state in ["wait_for_resume", " Analyzing_resume"]:
         st.info("Please upload your resume or paste its content to begin.")
     elif st.session_state.bot_state == "interview":
         st.subheader("Interview Progress")
@@ -732,133 +662,82 @@ def process_user_input(user_input):
                 add_message("assistant", "I'm ready whenever you are. Type 'start interview' to begin.")
     
     elif st.session_state.bot_state == "interview":
-        current_question = st.session_state.questions[st.session_state.current_question_index]
-        evaluation = evaluate_answer_with_nlp(current_question["question"], user_input, current_question["expected_keywords"])
-        
-        st.session_state.evaluations[current_question["question"]] = {
-            "answer": user_input,
-            "evaluation": evaluation
-        }
-        
-        feedback = evaluation["feedback"]
-        missing_concepts = evaluation.get("missing_concepts", [])
-        missing_text = ""
-        if missing_concepts:
-            missing_text = "\n\nConsider including these concepts in your answer: " + ", ".join(missing_concepts[:3])
-            if len(missing_concepts) > 3:
-                missing_text += ", and others."
-        
-        score = evaluation.get("score", 0)
-        score_message = f"\n\n**Score:** {score:.1f}/100"
-        
-        st.session_state.current_question_index += 1
-        
-        if st.session_state.current_question_index < len(st.session_state.questions):
-            next_question = st.session_state.questions[st.session_state.current_question_index]
-            transition = random.choice(QUESTION_TRANSITIONS)
-            response = f"{feedback}{missing_text}{score_message}\n\n{transition}\n\n**Question {st.session_state.current_question_index + 1}:** {next_question['question']}"
-            add_message("assistant", response)
-        else:
-            st.session_state.interview_complete = True
-            st.session_state.bot_state = "complete"
-            
-            evaluations = st.session_state.evaluations
-            total_score = sum(data["evaluation"].get("score", 0) for data in evaluations.values())
-            avg_score = total_score / len(evaluations) if evaluations else 0
-            
-            if avg_score >= 85:
-                rating = "Excellent"
-                message = "Your technical knowledge is impressive! You demonstrated a deep understanding of the concepts."
-            elif avg_score >= 70:
-                rating = "Good"
-                message = "You showed good technical knowledge. With a bit more practice, you'll excel in interviews."
-            elif avg_score >= 50:
-                rating = "Average"
-                message = "You have a decent foundation, but should work on strengthening your technical knowledge."
-            else:
-                rating = "Needs Improvement"
-                message = "You should focus on building a stronger technical foundation before your interviews."
-                
-            summary = generate_interview_summary(
-                st.session_state.candidate_name or "Candidate", 
-                st.session_state.interview_date,
-                avg_score,
-                rating,
-                st.session_state.skills,
-                evaluations,
-                st.session_state.questions
+        current_index = st.session_state.current_question_index
+        if current_index < len(st.session_state.questions):
+            current_question = st.session_state.questions[current_index]
+            evaluation = evaluate_answer_with_nlp(
+                current_question["question"],
+                user_input,
+                current_question["expected_keywords"]
             )
-                
-            response = f"{feedback}{missing_text}{score_message}\n\n**Interview Complete!**\n\nYour overall score is **{avg_score:.1f}/100** ({rating}).\n\n{message}\n\nHere's a summary of your performance:\n\n```\n{summary}\n```"
-            add_message("assistant", response)
+            st.session_state.evaluations[current_question["question"]] = {
+                "answer": user_input,
+                "evaluation": evaluation
+            }
+            st.session_state.current_question_index += 1
             
-            try:
+            if st.session_state.current_question_index < len(st.session_state.questions):
+                next_question = st.session_state.questions[st.session_state.current_question_index]
+                add_message("assistant", f"{evaluation['feedback']}\n\n{random.choice(QUESTION_TRANSITIONS)}\n\n**Question {st.session_state.current_question_index + 1}:** {next_question['question']}")
+            else:
+                st.session_state.bot_state = "complete"
+                evaluations = st.session_state.evaluations
+                total_score = sum(data["evaluation"].get("score", 0) for data in evaluations.values())
+                avg_score = total_score / len(evaluations) if evaluations else 0
+                rating = "Excellent" if avg_score >= 85 else "Good" if avg_score >= 70 else "Average" if avg_score >= 50 else "Needs Improvement"
+                
+                summary = generate_interview_summary(
+                    st.session_state.candidate_name or "Candidate",
+                    st.session_state.interview_date,
+                    avg_score,
+                    rating,
+                    st.session_state.skills,
+                    st.session_state.evaluations,
+                    st.session_state.questions
+                )
+                
+                add_message("assistant", f"Interview complete! Your overall score is {avg_score:.1f}/100 ({rating}).\n\nHere's your detailed summary:\n\n{summary}")
+                
                 pdf_path = export_results_as_pdf(
                     st.session_state.candidate_name or "Candidate",
                     st.session_state.interview_date,
                     avg_score,
                     rating,
                     st.session_state.skills,
-                    evaluations,
+                    st.session_state.evaluations,
                     st.session_state.questions
                 )
+                
                 with open(pdf_path, "rb") as f:
-                    pdf_bytes = f.read()
-                pdf_b64 = base64.b64encode(pdf_bytes).decode()
-                href = f'<a href="data:application/pdf;base64,{pdf_b64}" download="interview_results.pdf">Download PDF Report</a>'
-                st.markdown(href, unsafe_allow_html=True)
-            except Exception as e:
-                st.error(f"Error generating PDF: {e}")
-    
-    elif st.session_state.bot_state == "complete":
-        if "new interview" in user_input.lower() or "start over" in user_input.lower() or "again" in user_input.lower():
-            st.session_state.resume_text = ""
-            st.session_state.skills = {}
-            st.session_state.questions = []
-            st.session_state.current_question_index = 0
-            st.session_state.evaluations = {}
-            st.session_state.interview_complete = False
-            st.session_state.bot_state = "wait_for_resume"
-            add_message("assistant", random.choice(WELCOME_MESSAGES) + " " + random.choice(RESUME_PROMPTS))
-        else:
-            add_message("assistant", "The interview is complete! If you'd like to start a new interview, type 'new interview' or use the button in the sidebar.")
-
-if uploaded_file:
-    file_extension = uploaded_file.name.split(".")[-1].lower()
-    
-    if file_extension == "pdf":
-        with st.spinner("Processing PDF..."):
-            resume_text = extract_text_from_pdf(uploaded_file)
-    elif file_extension == "docx":
-        with st.spinner("Processing DOCX..."):
-            resume_text = extract_text_from_docx(uploaded_file)
-    else:
-        st.error("Unsupported file format")
-        resume_text = ""
-    
-    if resume_text and st.session_state.bot_state == "wait_for_resume":
-        st.session_state.resume_text = resume_text
-        st.session_state.bot_state = "analyzing_resume"
-        
-        add_message("user", "I've uploaded my resume.")
-        add_message("assistant", "Thanks for uploading your resume! I'm analyzing it to identify your technical skills...")
-        
-        skills = extract_skills(resume_text)
-        if not skills:
-            add_message("assistant", "I couldn't identify specific technical skills from your resume. Let's add some manually. What are your top technical skills? (e.g., Python, Java, AWS)")
-            st.session_state.bot_state = "manual_skills"
-        else:
-            st.session_state.skills = skills
-            skill_message = random.choice(SKILL_MESSAGES) + "\n\n" + format_skills_message(skills)
-            skill_message += "\n\nAre these skills accurate? You can add more skills if needed, or type 'start interview' when you're ready."
-            add_message("assistant", skill_message)
-            st.session_state.bot_state = "confirm_skills"
+                    st.session_state.pdf_data = f.read()
+                
+                add_message("assistant", "You can download your interview results as a PDF below.")
 
 with chat_container:
     for message in st.session_state.chat_messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
+    
+    if st.session_state.bot_state == "complete" and "pdf_data" in st.session_state:
+        st.download_button(
+            label="Download Interview Results (PDF)",
+            data=st.session_state.pdf_data,
+            file_name="interview_results.pdf",
+            mime="application/pdf"
+        )
 
-    if user_input := st.chat_input("Type here...", key="chat_input"):
+if uploaded_file is not None:
+    if uploaded_file.type == "application/pdf":
+        st.session_state.resume_text = extract_text_from_pdf(uploaded_file)
+    elif uploaded_file.type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+        st.session_state.resume_text = extract_text_from_docx(uploaded_file)
+    st.session_state.bot_state = "analyzing_resume"
+    add_message("assistant", "Thanks for uploading your resume! I'm analyzing it to identify your technical skills...")
+    process_user_input(st.session_state.resume_text)
+    st.rerun()
+
+if st.session_state.bot_state != "complete":
+    user_input = st.chat_input("Your response...")
+    if user_input:
         process_user_input(user_input)
         st.rerun()
