@@ -1,5 +1,9 @@
-import re
 import streamlit as st
+
+# Set page config as the very first command
+st.set_page_config(page_title="Technical Interview Chatbot", layout="wide")
+
+import re
 import io
 import base64
 import json
@@ -7,14 +11,17 @@ import os
 import random
 from datetime import datetime
 
+# Check for optional dependencies
 try:
     import PyPDF2
 except ImportError:
+    PyPDF2 = None
     st.error("PyPDF2 is not installed. Please install it with: pip install PyPDF2")
 
 try:
     import docx
 except ImportError:
+    docx = None
     st.error("python-docx is not installed. Please install it with: pip install python-docx")
 
 from fpdf import FPDF
@@ -23,20 +30,28 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 
+# NLTK import with robust data downloading
 try:
     import nltk
     from nltk.tokenize import word_tokenize
     from nltk.corpus import stopwords
     from nltk.stem import WordNetLemmatizer
     
-    nltk.download('punkt', quiet=True)
-    nltk.download('stopwords', quiet=True)
-    nltk.download('wordnet', quiet=True)
-    
-    NLP_ENABLED = True
-except ImportError as e:
-    st.warning(f"NLTK not installed: {e}. NLP features will be disabled.")
+    # Attempt to download NLTK data
+    try:
+        nltk.download('punkt', quiet=True)
+        nltk.download('stopwords', quiet=True)
+        nltk.download('wordnet', quiet=True)
+        # Verify punkt data is available
+        nltk.data.find('tokenizers/punkt_tab')
+        NLP_ENABLED = True
+    except LookupError:
+        st.warning("NLTK data (punkt, stopwords, or wordnet) could not be downloaded or found. NLP features will be disabled.")
+        NLP_ENABLED = False
+except ImportError:
+    nltk = None
     NLP_ENABLED = False
+    st.warning("NLTK is not installed. NLP features will be disabled. Install with: pip install nltk")
 
 COMMON_SKILLS = {
     'programming': ['python', 'java', 'javascript', 'html', 'css', 'c++', 'c#', 'ruby', 'php', 'sql', 'r'],
@@ -170,12 +185,16 @@ EVALUATION_NEEDS_IMPROVEMENT = [
 def preprocess_text(text):
     if not NLP_ENABLED:
         return text.lower()
-    tokens = word_tokenize(text.lower())
-    stop_words = set(stopwords.words('english'))
-    tokens = [token for token in tokens if token not in stop_words and token.isalnum()]
-    lemmatizer = WordNetLemmatizer()
-    tokens = [lemmatizer.lemmatize(token) for token in tokens]
-    return " ".join(tokens)
+    try:
+        tokens = word_tokenize(text.lower())
+        stop_words = set(stopwords.words('english'))
+        tokens = [token for token in tokens if token not in stop_words and token.isalnum()]
+        lemmatizer = WordNetLemmatizer()
+        tokens = [lemmatizer.lemmatize(token) for token in tokens]
+        return " ".join(tokens)
+    except LookupError:
+        st.error("NLTK data is missing. Falling back to basic text processing.")
+        return text.lower()
 
 def extract_skills_with_nlp(text):
     """Extract skills with very strict context-based matching using NLTK."""
@@ -263,6 +282,8 @@ def evaluate_answer_with_nlp(question, answer, expected_keywords):
     return {"score": score, "feedback": feedback, "missing_concepts": missing}
 
 def extract_text_from_pdf(pdf_file):
+    if PyPDF2 is None:
+        return ""
     try:
         pdf_reader = PyPDF2.PdfReader(pdf_file)
         text = ""
@@ -274,6 +295,8 @@ def extract_text_from_pdf(pdf_file):
         return ""
 
 def extract_text_from_docx(docx_file):
+    if docx is None:
+        return ""
     try:
         doc = docx.Document(docx_file)
         text = ""
@@ -421,8 +444,7 @@ def generate_interview_summary(candidate_name, interview_date, avg_score, rating
         summary.append("Consider spending more time studying the fundamentals of your technical areas.")
     return "\n".join(summary)
 
-st.set_page_config(page_title="Technical Interview Chatbot", layout="wide")
-
+# Initialize session state
 if "resume_text" not in st.session_state:
     st.session_state.resume_text = ""
 if "skills" not in st.session_state:
@@ -685,6 +707,7 @@ def process_user_input(user_input):
             st.session_state.interview_complete = False
             st.session_state.bot_state = "wait_for_resume"
             st.session_state.chat_messages = [{"role": "assistant", "content": random.choice(WELCOME_MESSAGES) + " " + random.choice(RESUME_PROMPTS)}]
+            st.session_state.candidate_name = ""
             st.session_state.debug_skills = []
             st.session_state.raw_resume_text = ""
             st.rerun()
