@@ -318,7 +318,7 @@ def evaluate_answer(question, answer, expected_keywords):
         return {"score": 0, "feedback": "No answer provided.", "missing_concepts": expected_keywords}
     if not genai:
         return {"score": 0, "feedback": "Gemini API not available.", "missing_concepts": expected_keywords}
-    GEMINI_API_KEY = st.secrets.get("AIzaSyDlb0thGyUHOBuT5bmv9a8QCkg-UX5iMgY", None)
+    GEMINI_API_KEY = st.secrets.get("gemini_api_key", None)
     if not GEMINI_API_KEY:
         return {"score": 0, "feedback": "No Gemini API key.", "missing_concepts": expected_keywords}
     try:
@@ -922,6 +922,9 @@ if login():
             if st.button("Send Email"):
                 if st.session_state.user_email:
                     try:
+                        evaluations = st.session_state.evaluations
+                        total_score = sum(data["evaluation"].get("score", 0) for data in evaluations.values())
+                        avg_score = total_score / len(evaluations) if evaluations else 0
                         interview_record = {
                             "candidate_name": st.session_state.candidate_name or "Candidate",
                             "date": st.session_state.interview_date,
@@ -932,4 +935,11 @@ if login():
                             "evaluations": st.session_state.evaluations
                         }
                         pdf_path = export_results_as_pdf(interview_record)
-                        if send_email(st.session}
+                        if send_email(st.session_state.user_email, interview_record, pdf_path):
+                            st.success(f"Results sent to {st.session_state.user_email}!")
+                        else:
+                            st.error("Failed to send email. Try downloading the PDF.")
+                    except Exception as e:
+                        st.error(f"Email error: {e}")
+                else:
+                    st.error("No email available. Please log in again.")
