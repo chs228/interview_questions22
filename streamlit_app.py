@@ -312,24 +312,57 @@ def extract_skills(text):
 def evaluate_answer(question, answer, expected_keywords):
     if not answer.strip():
         return {"score": 0, "feedback": "No answer provided.", "missing_concepts": expected_keywords}
-    
+    GEMINI_API_KEY = st.secrets.get("gemini_api_key", None)
+    if GEMINI_API_KEY:
+        try:
+            genai.configure(api_key=GEMINI_API_KEY)
+            model = genai.GenerativeModel('gemini-1.5-flash')
+            prompt = f"""
+            You are a technical interviewer. Evaluate:
+            **Question**: {question}
+            **Answer**: {answer}
+            **Expected Concepts**: {', '.join(expected_keywords)}
+            Return JSON:
+            {{"score": <0-100>, "feedback": "<string>", "missing_concepts": [<string>, ...]}}
+            """
+            response = model.generate_content(prompt)
+            result = json.loads(response.text.strip().replace("```json\n", "").replace("\n```", ""))
+            score = min(max(result.get("score", 0), 0), 100)
+            return {"score": score, "feedback": result.get("feedback", ""), "missing_concepts": result.get("missing_concepts", [])}
+        except Exception as e:
+            st.warning(f"Gemini failed: {e}. Using sentiment.")
     try:
         processed_answer = preprocess_text(answer)
         processed_keywords = [Word(kw).lemmatize() for kw in expected_keywords]
         keyword_count = sum(1 for kw in processed_keywords if kw in processed_answer)
-        score = min(keyword_count / len(expected_keywords), 1.0) * 100
+        base_score = min(keyword_count / len(expected_keywords), 1.0) * 100
         missing = [kw for kw in expected_keywords if Word(kw).lemmatize() not in processed_answer]
-        feedback = get_feedback_message(score)
-        if missing:
-            feedback += f" Consider including: {', '.join(missing[:3])}."
+        blob = TextBlob(answer)
+        polarity = blob.sentiment.polarity
+        subjectivity = blob.sentiment.subjectivity
+        modifier = 1.0
+        feedback = ""
+        if polarity > 0.2:
+            modifier += 0.1
+            feedback += "Confident tone!"
+        elif polarity < -0.2:
+            modifier -= 0.2
+            feedback += "Seems unsure."
+        if subjectivity < 0.4:
+            modifier += 0.1
+            feedback += " Factual."
+        elif subjectivity > 0.6:
+            modifier -= 0.1
+            feedback += " Be technical."
+        score = min(max(base_score * modifier, 0), 100)
+        feedback = get_feedback_message(score) + (f" Consider including: {', '.join(missing[:3])}." if missing else "") + (f" {feedback}" if feedback else "")
         return {"score": score, "feedback": feedback, "missing_concepts": missing}
     except Exception:
         keyword_count = sum(1 for kw in expected_keywords if kw.lower() in answer.lower())
         score = min(keyword_count / len(expected_keywords), 1.0) * 100
-        missing = [k for k in expected_keywords if k.lower() in answer.lower()]
-        feedback = get_feedback_message(score)
+        missing = [k for k in expected_keywords if k.lower() not in answer.lower()]
+        feedback = get_feedback_message(score) + (f" Consider including: {', '.join(missing[:3])}." if missing else "")
         return {"score": score, "feedback": feedback, "missing_concepts": missing}
-
 # File processing
 def extract_text_from_pdf(pdf_file):
     if PyPDF2 is None:
