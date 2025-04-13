@@ -316,8 +316,8 @@ def extract_skills(text):
 def evaluate_answer(question, answer, expected_keywords):
     if not answer.strip():
         return {"score": 0, "feedback": "No answer provided.", "missing_concepts": expected_keywords}
-    if not genai:
-        return {"score": 0, "feedback": "Gemini API not available.", "missing_concepts": expected_keywords}
+    # if not genai:
+    #     return {"score": 0, "feedback": "Gemini API not available.", "missing_concepts": expected_keywords}
     # GEMINI_API_KEY = "AIzaSyDlb0thGyUHOBuT5bmv9a8QCkg-UX5iMgY"
     # if not GEMINI_API_KEY:
     #     return {"score": 0, "feedback": "No Gemini API key.", "missing_concepts": expected_keywords}
