@@ -1,8 +1,4 @@
 import streamlit as st
-
-# Must be first
-st.set_page_config(page_title="Technical Interview Chatbot", layout="wide")
-
 import re
 import io
 import base64
@@ -16,6 +12,14 @@ from email.mime.base import MIMEBase
 from email import encoders
 import pyrebase
 from textblob import TextBlob, Word
+try:
+    import google.generativeai as genai
+except ImportError:
+    genai = None
+import json
+
+# Must be first
+st.set_page_config(page_title="Technical Interview Chatbot", layout="wide")
 
 # Dependencies
 try:
@@ -32,18 +36,17 @@ except ImportError:
 
 from fpdf import FPDF
 
-# Firebase configuration (loaded from Streamlit secrets)
+# Firebase configuration
 firebase_config = {
-    "apiKey": "AIzaSyDvFFLr-Fjhma2yae7rx3r7Ei0J6bXJmmI",
-    "authDomain": "client-2bbfc.firebaseapp.com",
-    "databaseURL": "https://client-2bbfc-default-rtdb.firebaseio.com",
-    "projectId": "client-2bbfc",
-    "storageBucket": "client-2bbfc.firebasestorage.app",
-    "messagingSenderId": "971318119261",
-    "appId": "1:971318119261:web:0cf9b5f290f1589326f6b4",
-    "measurementId": "G-5YHQGXBXJG"
+    "apiKey": st.secrets.get("firebase_api_key", "AIzaSyDvFFLr-Fjhma2yae7rx3r7Ei0J6bXJmmI"),
+    "authDomain": st.secrets.get("firebase_auth_domain", "client-2bbfc.firebaseapp.com"),
+    "databaseURL": st.secrets.get("firebase_database_url", "https://client-2bbfc-default-rtdb.firebaseio.com"),
+    "projectId": st.secrets.get("firebase_project_id", "client-2bbfc"),
+    "storageBucket": st.secrets.get("firebase_storage_bucket", "client-2bbfc.firebasestorage.app"),
+    "messagingSenderId": st.secrets.get("firebase_messaging_sender_id", "971318119261"),
+    "appId": st.secrets.get("firebase_app_id", "1:971318119261:web:0cf9b5f290f1589326f6b4"),
+    "measurementId": st.secrets.get("firebase_measurement_id", "G-5YHQGXBXJG")
 }
-
 
 # Initialize Firebase
 try:
@@ -53,9 +56,9 @@ except Exception as e:
     st.error(f"Firebase initialization failed: {e}. Check secrets.")
     auth = None
 
-# Email configuration (loaded from Streamlit secrets)
-EMAIL_SENDER = "projecttestingsubhash@gmail.com"
-EMAIL_PASSWORD = "zgwynxksfnwzusyk"
+# Email configuration
+EMAIL_SENDER = st.secrets.get("email_sender", "projecttestingsubhash@gmail.com")
+EMAIL_PASSWORD = st.secrets.get("email_password", "zgwynxksfnwzusyk")
 SMTP_SERVER = st.secrets.get("smtp_server", "smtp.gmail.com")
 SMTP_PORT = st.secrets.get("smtp_port", 587)
 
@@ -309,60 +312,35 @@ def extract_skills(text):
                 identified_skills[category] = list(found_skills)
         return identified_skills
 
+# Gemini-only evaluate_answer
 def evaluate_answer(question, answer, expected_keywords):
     if not answer.strip():
         return {"score": 0, "feedback": "No answer provided.", "missing_concepts": expected_keywords}
-    GEMINI_API_KEY = "AIzaSyDlb0thGyUHOBuT5bmv9a8QCkg-UX5iMgY"
-    if GEMINI_API_KEY:
-        try:
-            genai.configure(api_key=GEMINI_API_KEY)
-            model = genai.GenerativeModel('gemini-2.0-flash')
-            prompt = f"""
-            You are a technical interviewer. Evaluate:
-            **Question**: {question}
-            **Answer**: {answer}
-            **Expected Concepts**: {', '.join(expected_keywords)}
-            Return JSON:
-            {{"score": <0-100>, "feedback": "<string>", "missing_concepts": [<string>, ...]}}
-            """
-            response = model.generate_content(prompt)
+    if not genai:
+        return {"score": 0, "feedback": "Gemini API not available.", "missing_concepts": expected_keywords}
+    GEMINI_API_KEY = st.secrets.get("AIzaSyDlb0thGyUHOBuT5bmv9a8QCkg-UX5iMgY", None)
+    if not GEMINI_API_KEY:
+        return {"score": 0, "feedback": "No Gemini API key.", "missing_concepts": expected_keywords}
+    try:
+        genai.configure(api_key=GEMINI_API_KEY)
+        model = genai.GenerativeModel('gemini-1.5-flash')
+        prompt = f"""
+        You are a technical interviewer. Evaluate:
+        **Question**: {question}
+        **Answer**: {answer}
+        **Expected Concepts**: {', '.join(expected_keywords)}
+        Return JSON:
+        {{"score": <0-100>, "feedback": "<string>", "missing_concepts": [<string>, ...]}}
+        """
+        response = model.generate_content(prompt)
+        if response and hasattr(response, 'text') and response.text:
             result = json.loads(response.text.strip().replace("```json\n", "").replace("\n```", ""))
             score = min(max(result.get("score", 0), 0), 100)
-            return {"score": score, "feedback": result.get("feedback", ""), "missing_concepts": result.get("missing_concepts", [])}
-        except Exception as e:
-            st.warning(f"Gemini failed: {e}. Using sentiment.")
-    try:
-        processed_answer = preprocess_text(answer)
-        processed_keywords = [Word(kw).lemmatize() for kw in expected_keywords]
-        keyword_count = sum(1 for kw in processed_keywords if kw in processed_answer)
-        base_score = min(keyword_count / len(expected_keywords), 1.0) * 100
-        missing = [kw for kw in expected_keywords if Word(kw).lemmatize() not in processed_answer]
-        blob = TextBlob(answer)
-        polarity = blob.sentiment.polarity
-        subjectivity = blob.sentiment.subjectivity
-        modifier = 1.0
-        feedback = ""
-        if polarity > 0.2:
-            modifier += 0.1
-            feedback += "Confident tone!"
-        elif polarity < -0.2:
-            modifier -= 0.2
-            feedback += "Seems unsure."
-        if subjectivity < 0.4:
-            modifier += 0.1
-            feedback += " Factual."
-        elif subjectivity > 0.6:
-            modifier -= 0.1
-            feedback += " Be technical."
-        score = min(max(base_score * modifier, 0), 100)
-        feedback = get_feedback_message(score) + (f" Consider including: {', '.join(missing[:3])}." if missing else "") + (f" {feedback}" if feedback else "")
-        return {"score": score, "feedback": feedback, "missing_concepts": missing}
-    except Exception:
-        keyword_count = sum(1 for kw in expected_keywords if kw.lower() in answer.lower())
-        score = min(keyword_count / len(expected_keywords), 1.0) * 100
-        missing = [k for k in expected_keywords if k.lower() not in answer.lower()]
-        feedback = get_feedback_message(score) + (f" Consider including: {', '.join(missing[:3])}." if missing else "")
-        return {"score": score, "feedback": feedback, "missing_concepts": missing}
+            return {"score": score, "feedback": result.get("feedback", "No feedback."), "missing_concepts": result.get("missing_concepts", [])}
+        return {"score": 0, "feedback": "Invalid Gemini response.", "missing_concepts": expected_keywords}
+    except Exception as e:
+        return {"score": 0, "feedback": f"Gemini failed: {str(e)}", "missing_concepts": expected_keywords}
+
 # File processing
 def extract_text_from_pdf(pdf_file):
     if PyPDF2 is None:
@@ -954,11 +932,4 @@ if login():
                             "evaluations": st.session_state.evaluations
                         }
                         pdf_path = export_results_as_pdf(interview_record)
-                        if send_email(st.session_state.user_email, interview_record, pdf_path):
-                            st.success(f"Results sent to {st.session_state.user_email}!")
-                        else:
-                            st.error("Failed to send email. Try downloading the PDF.")
-                    except Exception as e:
-                        st.error(f"Error: {e}")
-                else:
-                    st.error("No email available. Please log in again.")
+                        if send_email(st.session}
