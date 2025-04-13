@@ -312,11 +312,11 @@ def extract_skills(text):
 def evaluate_answer(question, answer, expected_keywords):
     if not answer.strip():
         return {"score": 0, "feedback": "No answer provided.", "missing_concepts": expected_keywords}
-    GEMINI_API_KEY = st.secrets.get("gemini_api_key", None)
+    GEMINI_API_KEY = "AIzaSyDlb0thGyUHOBuT5bmv9a8QCkg-UX5iMgY"
     if GEMINI_API_KEY:
         try:
             genai.configure(api_key=GEMINI_API_KEY)
-            model = genai.GenerativeModel('gemini-1.5-flash')
+            model = genai.GenerativeModel('gemini-2.0-flash')
             prompt = f"""
             You are a technical interviewer. Evaluate:
             **Question**: {question}
