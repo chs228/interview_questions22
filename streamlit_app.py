@@ -318,11 +318,11 @@ def evaluate_answer(question, answer, expected_keywords):
         return {"score": 0, "feedback": "No answer provided.", "missing_concepts": expected_keywords}
     if not genai:
         return {"score": 0, "feedback": "Gemini API not available.", "missing_concepts": expected_keywords}
-    GEMINI_API_KEY = "AIzaSyDlb0thGyUHOBuT5bmv9a8QCkg-UX5iMgY"
-    if not GEMINI_API_KEY:
-        return {"score": 0, "feedback": "No Gemini API key.", "missing_concepts": expected_keywords}
+    # GEMINI_API_KEY = "AIzaSyDlb0thGyUHOBuT5bmv9a8QCkg-UX5iMgY"
+    # if not GEMINI_API_KEY:
+    #     return {"score": 0, "feedback": "No Gemini API key.", "missing_concepts": expected_keywords}
     try:
-        genai.configure(api_key=GEMINI_API_KEY)
+        genai.configure(api_key="AIzaSyDlb0thGyUHOBuT5bmv9a8QCkg-UX5iMgY")
         model = genai.GenerativeModel('gemini-1.5-flash')
         prompt = f"""
         You are a technical interviewer. Evaluate:
