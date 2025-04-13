@@ -38,14 +38,14 @@ from fpdf import FPDF
 
 # Firebase configuration
 firebase_config = {
-    "apiKey": st.secrets.get("firebase_api_key", "AIzaSyDvFFLr-Fjhma2yae7rx3r7Ei0J6bXJmmI"),
-    "authDomain": st.secrets.get("firebase_auth_domain", "client-2bbfc.firebaseapp.com"),
-    "databaseURL": st.secrets.get("firebase_database_url", "https://client-2bbfc-default-rtdb.firebaseio.com"),
-    "projectId": st.secrets.get("firebase_project_id", "client-2bbfc"),
-    "storageBucket": st.secrets.get("firebase_storage_bucket", "client-2bbfc.firebasestorage.app"),
-    "messagingSenderId": st.secrets.get("firebase_messaging_sender_id", "971318119261"),
-    "appId": st.secrets.get("firebase_app_id", "1:971318119261:web:0cf9b5f290f1589326f6b4"),
-    "measurementId": st.secrets.get("firebase_measurement_id", "G-5YHQGXBXJG")
+    "apiKey": "AIzaSyDvFFLr-Fjhma2yae7rx3r7Ei0J6bXJmmI",
+    "authDomain": "client-2bbfc.firebaseapp.com",
+    "databaseURL": "https://client-2bbfc-default-rtdb.firebaseio.com",
+    "projectId": "client-2bbfc",
+    "storageBucket": "client-2bbfc.firebasestorage.app",
+    "messagingSenderId": "971318119261",
+    "appId": "1:971318119261:web:0cf9b5f290f1589326f6b4",
+    "measurementId": "G-5YHQGXBXJG"
 }
 
 # Initialize Firebase
